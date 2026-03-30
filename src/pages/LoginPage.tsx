@@ -1,16 +1,13 @@
 import React, { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState<string>("hong.sophaline@institute.com");
-  const [password, setPassword] = useState<string>("supersecretpassword");
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [phone, setPhone] = useState<string>("");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Logging in with:", { email, password });
-    // TODO: Connect your authentication logic here
+    console.log("Logging in with phone:", phone);
+    // TODO: Connect your OTP authentication logic here
   };
 
   return (
@@ -21,54 +18,30 @@ const LoginPage: React.FC = () => {
           Sign in
         </h1>
 
-        <form onSubmit={handleSubmit} className="w-full space-y-6">
-          {/* Email Field */}
-          <div className="flex flex-col space-y-1.5">
+        <form onSubmit={handleSubmit} className="w-full">
+          {/* Phone Number Field */}
+          <div className="flex flex-col space-y-1.5 mb-4">
             <label className="text-xs text-gray-500 font-medium">
-              Your Email
+              Phone Number
             </label>
             <input
-              type="email"
-              value={email}
+              type="tel"
+              value={phone}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setEmail(e.target.value)
+                setPhone(e.target.value)
               }
+              placeholder="+855 123 456 789"
               className="w-full p-3.5 bg-gray-100 text-gray-800 text-sm rounded-md focus:outline-none focus:bg-white focus:ring-1 focus:ring-gray-300 transition-all"
               required
             />
           </div>
 
-          {/* Password Field */}
-          <div className="flex flex-col space-y-1.5">
-            <label className="text-xs text-gray-500 font-medium">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setPassword(e.target.value)
-                }
-                className="w-full p-3.5 bg-gray-100 text-gray-800 text-sm rounded-md pr-12 focus:outline-none focus:bg-white focus:ring-1 focus:ring-gray-300 transition-all"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-4 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Login Button */}
+          {/* OTP / Login Button */}
           <button
             type="submit"
             className="w-full mt-4 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold text-sm rounded-md shadow-sm transition-colors"
           >
-            Login
+            Send OTP
           </button>
         </form>
 
