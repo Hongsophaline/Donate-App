@@ -96,7 +96,7 @@ const SignUpPage: React.FC = () => {
           {/* Sign Up Button */}
           <button
             type="submit"
-            className="w-full mt-4 py-3 bg-pink-500 hover:bg-pink-600 text-white font-semibold text-sm rounded-md shadow-sm transition-colors"
+            className="w-full mt-4 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold text-sm rounded-md shadow-sm transition-colors"
           >
             Sign Up
           </button>

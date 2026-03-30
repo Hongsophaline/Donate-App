@@ -1,0 +1,147 @@
+{
+  "navbar": {
+    "home": "首页",
+    "donate": "捐赠",
+    "browse": "浏览",
+    "howItWorks": "使用方法",
+    "contact": "联系",
+    "login": "登录",
+    "signUp": "注册"
+  },
+  "footer": {
+    "text": "© 2026 您的应用。保留所有权利。"
+  },
+  "home": {
+    "hero": {
+      "tagline": "连接人与人",
+      "titlePart1": "捐出您拥有的，",
+      "titlePart2": "改变一个生命",
+      "desc": "将衣物、家具、书籍等捐赠给本地慈善机构和有需要的人。帮助减少浪费，建设更强大的社区。",
+      "getStarted": "开始 →",
+      "howItWorks": "使用方法",
+      "alt": "捐赠箱"
+    },
+    "features": {
+      "title": "功能",
+      "subtitle": "您需要的一切来回馈社会",
+      "easyListing": "轻松列出物品",
+      "easyListingDesc": "轻松列出您的多余物品，让慈善机构找到。",
+      "findCharities": "寻找附近的慈善机构",
+      "findCharitiesDesc": "发现您附近活跃的本地慈善机构。",
+      "schedulePickup": "安排取货",
+      "schedulePickupDesc": "轻松安排物品被收取的时间。",
+      "trackImpact": "追踪影响",
+      "trackImpactDesc": "查看您的捐赠如何帮助他人。",
+      "notifications": "实时通知",
+      "notificationsDesc": "即时了解捐赠状态。",
+      "rateReview": "评价与评论",
+      "rateReviewDesc": "分享您的体验并建立社区信任。"
+    },
+    "categories": {
+      "title": "捐赠类别",
+      "subtitle": "您可以捐赠什么？",
+      "clothing": "衣物",
+      "furniture": "家具",
+      "books": "书籍",
+      "electronics": "电子产品",
+      "baby": "婴幼儿用品",
+      "others": "其他"
+    },
+    "steps": {
+      "title": "使用方法",
+      "subtitle": "四个简单步骤",
+      "createAccount": {
+        "title": "创建账户",
+        "desc": "通过创建简单的个人资料加入我们的社区。"
+      },
+      "listBrowse": {
+        "title": "列出或浏览物品",
+        "desc": "发布您想要捐赠的物品，或寻找您需要的物品。"
+      },
+      "connectSchedule": {
+        "title": "联系与安排",
+        "desc": "直接发送消息并安排取货或交付时间。"
+      },
+      "makeImpact": {
+        "title": "产生影响",
+        "desc": "帮助环境和社区中的他人。"
+      }
+    }
+  },
+  "donate": {
+    "title": "捐赠物品",
+    "subtitle": "请填写以下信息以发布您的捐赠物品。",
+    "fields": {
+      "title": "物品标题",
+      "category": "物品类别",
+      "description": "描述",
+      "photos": "照片"
+    },
+    "placeholders": {
+      "title": "例如：冬季外套，几乎全新",
+      "category": "选择类别",
+      "description": "描述物品状况、尺寸及其他细节",
+      "upload": "点击上传照片",
+      "uploadInfo": "PNG, JPG 文件大小不超过 5MB",
+      "location": "输入您的地址或区域"
+    },
+    "categories": {
+      "clothing": "衣物",
+      "furniture": "家具",
+      "electronics": "电子产品",
+      "books": "书籍"
+    },
+    "selectedImages": "已选择",
+    "images": "张照片",
+    "submit": "提交捐赠"
+  },
+
+  "browse": {
+    "title": "浏览捐赠",
+    "subtitle": "在您的地区查找可捐赠的物品"
+  },
+  "howItWorks": {
+    "subtitle": "运作方式",
+    "title": "四个简单步骤",
+    "steps": {
+      "step1": {
+        "title": "创建账户",
+        "desc": "创建一个简单的个人资料，加入我们的社区。"
+      },
+      "step2": {
+        "title": "发布或浏览物品",
+        "desc": "发布您想捐赠的物品或寻找您需要的东西。"
+      },
+      "step3": {
+        "title": "联系并安排时间",
+        "desc": "直接沟通并安排取件或交付时间。"
+      },
+      "step4": {
+        "title": "创造影响",
+        "desc": "帮助环境并帮助社区中的他人。"
+      }
+    }
+  },
+  "contact": {
+    "title": "联系与常见问题",
+    "subtitle": "有问题吗？我们随时为您提供帮助。",
+    "getInTouch": "联系我们",
+    "form": {
+      "name": "您的姓名",
+      "email": "您的邮箱",
+      "message": "您的留言",
+      "submit": "发送信息"
+    },
+    "faq": {
+      "title": "常见问题",
+      "q1": "我可以捐赠什么物品？",
+      "a1": "您可以捐赠衣物、家具、书籍等。",
+      "q2": "如何安排取件？",
+      "a2": "匹配后可以安排时间取件。",
+      "q3": "是否收费？",
+      "a3": "不收费，完全免费。",
+      "q4": "机构如何验证？",
+      "a4": "所有机构都会经过审核。"
+    }
+  }
+}

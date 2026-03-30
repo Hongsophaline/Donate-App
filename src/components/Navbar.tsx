@@ -1,72 +1,102 @@
-import { Link } from "react-router-dom";
 import { useState } from "react";
-import logoImg from "../assets/logo.jpg";
+import { NavLink, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { Menu, X } from "lucide-react";
+import logoImg from "../assets/logo.png";
+import LanguageSelector from "../components/common/LanguageSelector";
 
 const Navbar = () => {
-  const [language, setLanguage] = useState("en"); // default language
+  const { t } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value);
-    // Here you can also call a function to update i18n or translation state
-    console.log("Selected language:", e.target.value);
-  };
+  const navClass = ({ isActive }: { isActive: boolean }) =>
+    isActive
+      ? "bg-green-300 text-black px-4 py-2 rounded-lg transition"
+      : "px-4 py-2 hover:bg-gray-100 rounded-lg transition";
+
+  const paths = ["/", "/donate", "/browse", "/how-it-works", "/contact"];
+  const labels = ["home", "donate", "browse", "howItWorks", "contact"];
 
   return (
-    <nav className="sticky top-0 z-50 w-full flex items-center justify-between px-10 py-1 bg-white border-b border-gray-100 shadow-sm">
-      {/* 1. Left Section: Logo */}
-      <div className="flex items-center">
-        <Link to="/" className="flex items-center gap-1">
-          <img
-            src={logoImg}
-            alt="KindDrop Logo"
-            width={110}
-            height={40}
-            className="object-contain"
-          />
+    <nav className="sticky top-0 z-50 w-full bg-white border-b shadow-sm">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-10 py-2">
+        {/* Logo */}
+        <Link to="/">
+          <img src={logoImg} alt="Logo" className="w-[90px] h-[70px]" />
         </Link>
+
+        {/* Desktop Menu */}
+        <div className="hidden md:flex gap-4 font-medium text-gray-700">
+          {paths.map((path, i) => (
+            <NavLink key={i} to={path} className={navClass}>
+              {t(`navbar.${labels[i]}`)}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* Right Section */}
+        <div className="flex items-center gap-2">
+          {/* Language Selector */}
+          <div className="hidden md:block">
+            <LanguageSelector />
+          </div>
+
+          {/* Desktop Login & Signup */}
+          <div className="hidden md:flex gap-2">
+            <Link
+              to="/login"
+              className="px-4 py-2 hover:bg-green-300 rounded-lg transition"
+            >
+              {t("navbar.login")}
+            </Link>
+            <Link
+              to="/signup"
+              className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition"
+            >
+              {t("navbar.signUp")}
+            </Link>
+          </div>
+
+          {/* Mobile Login */}
+          <div className="md:hidden">
+            <Link
+              to="/login"
+              className="px-3 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition"
+            >
+              {t("navbar.login")}
+            </Link>
+          </div>
+
+          {/* Mobile Hamburger */}
+          <div className="md:hidden flex items-center ml-2">
+            <button
+              className="p-2 rounded-md hover:bg-gray-100 transition"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* 2. Middle Section */}
-      <div className="hidden md:flex items-center gap-10 font-medium text-[#444] text-base">
-        <Link to="/" className="bg-[#F094B5] text-black px-6 py-2.5 rounded-md">
-          Home
-        </Link>
-        <Link to="/donate" className="hover:text-black">
-          Donate
-        </Link>
-        <Link to="/browse" className="hover:text-black">
-          Browse
-        </Link>
-        <Link to="/how-it-works" className="hover:text-black">
-          How It Work
-        </Link>
-        <Link to="/contact" className="hover:text-black">
-          Contact
-        </Link>
-      </div>
-
-      {/* 3. Right Section */}
-      <div className="flex items-center gap-4 text-base font-medium">
-        {/* Language Dropdown */}
-        <select
-          value={language}
-          onChange={handleLanguageChange}
-          className="border border-gray-300 rounded-md px-2 py-1 text-sm"
-        >
-          <option value="km">Khmer</option>
-          <option value="en">English</option>
-          <option value="zh">Chinese</option>
-        </select>
-
-        <Link to="/login" className="text-[#444] hover:text-black">
-          Login
-        </Link>
-        <Link
-          to="/signup"
-          className="bg-[#E03080] text-white px-7 py-3 rounded-lg font-semibold"
-        >
-          Sign Up
-        </Link>
+      {/* Mobile Menu (Links Only) */}
+      <div
+        className={`md:hidden bg-white border-t shadow-sm transition-all duration-300 ${
+          isOpen ? "max-h-screen" : "max-h-0 overflow-hidden"
+        }`}
+      >
+        <div className="flex flex-col px-4 py-2 gap-2 font-medium text-gray-700">
+          {paths.map((path, i) => (
+            <NavLink
+              key={i}
+              to={path}
+              className={navClass}
+              onClick={() => setIsOpen(false)}
+            >
+              {t(`navbar.${labels[i]}`)}
+            </NavLink>
+          ))}
+        </div>
       </div>
     </nav>
   );

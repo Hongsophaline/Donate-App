@@ -1,0 +1,147 @@
+{
+  "navbar": {
+    "home": "Home",
+    "donate": "Donate",
+    "browse": "Browse",
+    "howItWorks": "How it works",
+    "contact": "Contact",
+    "login": "Login",
+    "signUp": "Sign Up"
+  },
+  "footer": {
+    "text": "© 2026 Your App. All rights reserved."
+  },
+  "home": {
+    "hero": {
+      "tagline": "Connecting people with each other",
+      "titlePart1": "Give What You Have,",
+      "titlePart2": "Change a Life",
+      "desc": "Donate clothes, furniture, books, and more to local charities and individuals in need. Help us reduce waste and build a stronger community.",
+      "getStarted": "Get Started →",
+      "howItWorks": "How it works",
+      "alt": "Donation Boxes"
+    },
+    "features": {
+      "title": "Features",
+      "subtitle": "Everything You Need to Give Back",
+      "easyListing": "Easy Item Listing",
+      "easyListingDesc": "List your surplus items with ease for charities to find.",
+      "findCharities": "Find Nearby Charities",
+      "findCharitiesDesc": "Discover active local charities in your neighborhood.",
+      "schedulePickup": "Schedule Pickup",
+      "schedulePickupDesc": "Easily arrange a time for items to be collected.",
+      "trackImpact": "Track Your Impact",
+      "trackImpactDesc": "See exactly how your donations are helping people.",
+      "notifications": "Real-time Notifications",
+      "notificationsDesc": "Stay updated on your donation status instantly.",
+      "rateReview": "Rate & Review",
+      "rateReviewDesc": "Share your experience and build trust in the community."
+    },
+    "categories": {
+      "title": "Categories",
+      "subtitle": "What Can You Donate?",
+      "clothing": "Clothing",
+      "furniture": "Furniture",
+      "books": "Books",
+      "electronics": "Electronics",
+      "baby": "Baby & Kids",
+      "others": "Others"
+    },
+    "steps": {
+      "title": "How it works",
+      "subtitle": "Four Simple Steps",
+      "createAccount": {
+        "title": "Create an Account",
+        "desc": "Join our community by creating a simple profile."
+      },
+      "listBrowse": {
+        "title": "List or Browse Items",
+        "desc": "Post items you want to give or find things you need."
+      },
+      "connectSchedule": {
+        "title": "Connect & Schedule",
+        "desc": "Message directly and set a pickup or drop-off time."
+      },
+      "makeImpact": {
+        "title": "Make an Impact",
+        "desc": "Help the environment and someone in your community."
+      }
+    }
+  },
+
+  "donate": {
+    "title": "Donate Your Items",
+    "subtitle": "Fill in the details below to list your items for donation.",
+    "fields": {
+      "title": "Item Title",
+      "category": "Category Item",
+      "description": "Description",
+      "photos": "Photos"
+    },
+    "placeholders": {
+      "title": "e.g., Winter jacket, like new",
+      "category": "Select a Category",
+      "description": "Describe the condition, size and any other detail",
+      "upload": "Click to upload photos",
+      "uploadInfo": "PNG, JPG up to 5MB",
+      "location": "Enter your address or area"
+    },
+    "categories": {
+      "clothing": "Clothing",
+      "furniture": "Furniture",
+      "electronics": "Electronics",
+      "books": "Books"
+    },
+    "selectedImages": "Selected",
+    "images": "images",
+    "submit": "Submit Donation"
+  },
+  "browse": {
+    "title": "Browse Donations",
+    "subtitle": "Find items available for donation in your area."
+  },
+  "howItWorks": {
+    "subtitle": "How it works",
+    "title": "Four Simple Steps",
+    "steps": {
+      "step1": {
+        "title": "Create an Account",
+        "desc": "Join our community by creating a simple profile."
+      },
+      "step2": {
+        "title": "List or Browse Items",
+        "desc": "Post items you want to give or find things you need."
+      },
+      "step3": {
+        "title": "Connect & Schedule",
+        "desc": "Message directly and set a pickup or drop-off time."
+      },
+      "step4": {
+        "title": "Make an Impact",
+        "desc": "Help the environment and someone in your community."
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact & FAQ",
+    "subtitle": "Have questions? We're here to help.",
+    "getInTouch": "Get in Touch",
+    "form": {
+      "name": "Your Name",
+      "email": "Your Email",
+      "message": "Your Message",
+      "submit": "Send Message"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "What items can I donate?",
+      "a1": "You can donate clothes, furniture, books, electronics, kitchen items, baby goods, and more.",
+      "q2": "How does pickup work?",
+      "a2": "You can schedule a pickup after matching with an organization.",
+      "q3": "Is there a cost to use KindDrop?",
+      "a3": "No! It is completely free.",
+      "q4": "How are organizations verified?",
+      "a4": "All organizations go through a verification process."
+    }
+  }
+}
