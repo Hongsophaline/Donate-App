@@ -65,7 +65,6 @@
       }
     }
   },
-
   "donate": {
     "title": "Donate Your Items",
     "subtitle": "Fill in the details below to list your items for donation.",
@@ -156,5 +155,60 @@
     "termsOfService": "Terms Of Service",
     "cookiePolicy": "Cookie Policy",
     "copyright": "© 2026 GiveFlow. Made with ❤ by Hong Sophaline & Thoeun Mary"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Manage donation requests and stay updated.",
+    "unreadCount": "{{count}} unread",
+    "pendingTitle": "Pending Requests",
+    "allTitle": "All Notifications",
+    "markRead": "Mark all read",
+    "approve": "Approve",
+    "reject": "Reject",
+    "requested": "requested your \"{{item}}\""
+  },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your account information",
+    "editBtn": "Edit Profile",
+    "memberSince": "Member since",
+    "stats": {
+      "donations": "Donations",
+      "location": "Location",
+      "joined": "Joined"
+    },
+    "labels": {
+      "fullName": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location",
+      "bio": "Bio"
+    }
+  },
+  "signup": {
+    "title": "Create an account",
+    "individual": "Individual",
+    "organization": "Organization",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "dob": "Date of Birth",
+    "orgEmail": "Organization Email",
+    "password": "Password",
+    "button": "Sign Up",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginLink": "Log in",
+    "errors": {
+      "dobRequired": "Please select your date of birth.",
+      "underage": "You must be at least 18 years old to register.",
+      "orgEmailRequired": "Organization email is required."
+    }
+  },
+  "login": {
+    "title": "Sign in",
+    "phoneLabel": "Phone Number",
+    "sendOtp": "Send OTP",
+    "noAccount": "Don't have an account?",
+    "signupLink": "Sign up",
+    "createAccountBtn": "Create an account"
   }
 }

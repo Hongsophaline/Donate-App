@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Added
 
 const LoginPage: React.FC = () => {
+  const { t } = useTranslation(); // Initialize translation
   const [phone, setPhone] = useState<string>("");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -15,14 +17,14 @@ const LoginPage: React.FC = () => {
       <div className="w-full max-w-xl flex flex-col items-center">
         {/* Title */}
         <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-12">
-          Sign in
+          {t("login.title")}
         </h1>
 
         <form onSubmit={handleSubmit} className="w-full">
           {/* Phone Number Field */}
           <div className="flex flex-col space-y-1.5 mb-4">
             <label className="text-xs text-gray-500 font-medium">
-              Phone Number
+              {t("login.phoneLabel")}
             </label>
             <input
               type="tel"
@@ -41,18 +43,18 @@ const LoginPage: React.FC = () => {
             type="submit"
             className="w-full mt-4 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold text-sm rounded-md shadow-sm transition-colors"
           >
-            Send OTP
+            {t("login.sendOtp")}
           </button>
         </form>
 
         {/* Account help links */}
         <div className="mt-4 text-xs text-gray-600">
-          Don't have an account?{" "}
+          {t("login.noAccount")}{" "}
           <Link
             to="/signup"
             className="text-blue-500 underline hover:text-blue-600"
           >
-            Sign up
+            {t("login.signupLink")}
           </Link>
         </div>
 
@@ -62,7 +64,7 @@ const LoginPage: React.FC = () => {
             to="/signup"
             className="inline-block px-10 py-3 bg-orange-700 hover:bg-orange-800 text-white text-sm font-semibold rounded-md shadow-sm transition-colors"
           >
-            Create an account
+            {t("login.createAccountBtn")}
           </Link>
         </div>
       </div>

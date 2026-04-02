@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Added
 
 interface SignUpForm {
   fullName: string;
@@ -12,6 +13,7 @@ interface SignUpForm {
 }
 
 const SignUpPage: React.FC = () => {
+  const { t } = useTranslation(); // Initialize
   const [userType, setUserType] = useState<"individual" | "organization">(
     "individual",
   );
@@ -28,70 +30,52 @@ const SignUpPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError(""); // clear error when typing
+    setError("");
   };
 
-  // Check age ≥ 18
   const isAdult = (dob: string) => {
     const birthDate = new Date(dob);
     const today = new Date();
-
     let age = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
-
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-
     return age >= 18;
   };
 
-  // Handle submit
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Validate Individual
     if (userType === "individual") {
       if (!formData.dateOfBirth) {
-        setError("Please select your date of birth.");
+        setError(t("signup.errors.dobRequired"));
         return;
       }
-
       if (!isAdult(formData.dateOfBirth)) {
-        setError("You must be at least 18 years old to register.");
+        setError(t("signup.errors.underage"));
         return;
       }
     }
 
-    // Validate Organization
     if (userType === "organization" && !formData.organizationEmail) {
-      setError("Organization email is required.");
+      setError(t("signup.errors.orgEmailRequired"));
       return;
     }
 
-    const payload = {
-      ...formData,
-      type: userType,
-    };
-
-    console.log("Register Data:", payload);
-
-    // TODO: API call here
+    console.log("Register Data:", { ...formData, type: userType });
   };
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center py-12 px-4">
       <div className="w-full max-w-xl flex flex-col items-center">
-        {/* Title */}
         <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-8">
-          Create an account
+          {t("signup.title")}
         </h1>
 
-        {/* User Type Selector */}
         <div className="flex w-full mb-8 bg-gray-100 rounded-md p-1">
           <button
             type="button"
@@ -102,7 +86,7 @@ const SignUpPage: React.FC = () => {
                 : "text-gray-500"
             }`}
           >
-            Individual
+            {t("signup.individual")}
           </button>
 
           <button
@@ -114,16 +98,14 @@ const SignUpPage: React.FC = () => {
                 : "text-gray-500"
             }`}
           >
-            Organization
+            {t("signup.organization")}
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="w-full space-y-6">
-          {/* Full Name */}
           <div className="flex flex-col space-y-1.5">
             <label className="text-xs text-gray-500 font-medium">
-              Full Name
+              {t("signup.fullName")}
             </label>
             <input
               type="text"
@@ -136,10 +118,9 @@ const SignUpPage: React.FC = () => {
             />
           </div>
 
-          {/* Phone */}
           <div className="flex flex-col space-y-1.5">
             <label className="text-xs text-gray-500 font-medium">
-              Phone Number
+              {t("signup.phone")}
             </label>
             <input
               type="tel"
@@ -152,11 +133,10 @@ const SignUpPage: React.FC = () => {
             />
           </div>
 
-          {/* DOB for Individual */}
           {userType === "individual" && (
             <div className="flex flex-col space-y-1.5">
               <label className="text-xs text-gray-500 font-medium">
-                Date of Birth
+                {t("signup.dob")}
               </label>
               <input
                 type="date"
@@ -169,11 +149,10 @@ const SignUpPage: React.FC = () => {
             </div>
           )}
 
-          {/* Organization Email */}
           {userType === "organization" && (
             <div className="flex flex-col space-y-1.5">
               <label className="text-xs text-gray-500 font-medium">
-                Organization Email
+                {t("signup.orgEmail")}
               </label>
               <input
                 type="email"
@@ -187,10 +166,9 @@ const SignUpPage: React.FC = () => {
             </div>
           )}
 
-          {/* Password */}
           <div className="flex flex-col space-y-1.5">
             <label className="text-xs text-gray-500 font-medium">
-              Password
+              {t("signup.password")}
             </label>
             <div className="relative">
               <input
@@ -211,26 +189,23 @@ const SignUpPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Error Message */}
           {error && <p className="text-red-500 text-xs font-medium">{error}</p>}
 
-          {/* Submit */}
           <button
             type="submit"
             className="w-full mt-2 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold text-sm rounded-md shadow-sm transition-colors"
           >
-            Sign Up
+            {t("signup.button")}
           </button>
         </form>
 
-        {/* Login Redirect */}
         <div className="mt-6 text-xs text-gray-600">
-          Already have an account?{" "}
+          {t("signup.alreadyHaveAccount")}{" "}
           <Link
             to="/login"
             className="text-blue-500 underline hover:text-blue-600"
           >
-            Log in
+            {t("signup.loginLink")}
           </Link>
         </div>
       </div>
