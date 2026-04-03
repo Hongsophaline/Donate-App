@@ -170,12 +170,14 @@
   "profile": {
     "title": "个人资料",
     "subtitle": "管理您的账户信息",
-    "editBtn": "编辑个人资料",
+    "editBtn": "编辑资料",
     "memberSince": "注册时间",
+    "logoutPrompt": "想要切换账号？",
+    "logoutLink": "退出登录",
     "stats": {
       "donations": "捐赠次数",
-      "location": "位置",
-      "joined": "注册日期"
+      "location": "地点",
+      "joined": "加入时间"
     },
     "labels": {
       "fullName": "姓名",

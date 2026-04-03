@@ -175,6 +175,8 @@
     "subtitle": "Manage your account information",
     "editBtn": "Edit Profile",
     "memberSince": "Member since",
+    "logoutPrompt": "Want to switch accounts?",
+    "logoutLink": "Log out",
     "stats": {
       "donations": "Donations",
       "location": "Location",

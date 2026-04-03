@@ -1,12 +1,22 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { User, MapPin, Calendar, Box, Mail, Phone, Edit3 } from "lucide-react";
 
+/**
+ * Interface for ProfileField Props
+ */
+interface ProfileFieldProps {
+  label: string;
+  value: string | number;
+  icon?: React.ReactNode;
+  isTextArea?: boolean;
+}
+
 const ProfilePage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
-  // Mock user data - logic remains the same
   const userData = {
     name: "Sophaline Hong",
     email: "hong.sophaline@institute.com",
@@ -15,6 +25,17 @@ const ProfilePage = () => {
     bio: "Passionate about helping communities through donations. I believe small acts of kindness can change the world.",
     joinedDate: "Mar 2026",
     donationCount: 12,
+  };
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Logic: Clear your tokens/auth state here
+    // Example: localStorage.removeItem("userToken");
+
+    console.log("User logged out");
+
+    // Redirecting to Sign Up page
+    navigate("/signup");
   };
 
   return (
@@ -30,8 +51,7 @@ const ProfilePage = () => {
 
         {/* Main Profile Card */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          {/* Cover Accent (Optional Decorative Strip) */}
-          <div className="h-2  w-full"></div>
+          <div className="h-2 w-full "></div>
 
           <div className="p-8">
             {/* Top Info Area */}
@@ -50,7 +70,6 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              {/* Edit Profile Link */}
               <Link to="/edit-profile">
                 <button className="flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm active:scale-95">
                   <Edit3 size={18} className="text-green-600" />
@@ -92,26 +111,36 @@ const ProfilePage = () => {
                   icon={<Phone size={16} />}
                 />
               </div>
-
               <ProfileField
                 label={t("profile.labels.email")}
                 value={userData.email}
                 icon={<Mail size={16} />}
               />
-
               <ProfileField
                 label={t("profile.labels.location")}
                 value={userData.location}
                 icon={<MapPin size={16} />}
               />
-
               <ProfileField
                 label={t("profile.labels.bio")}
                 value={userData.bio}
-                isTextArea
+                isTextArea={true}
               />
             </div>
           </div>
+        </div>
+
+        {/* LOGOUT OUTSIDE THE BOX */}
+        <div className="mt-8 text-center">
+          <p className="text-gray-500 text-sm">
+            {t("profile.logoutPrompt") || "Want to switch accounts?"}{" "}
+            <button
+              onClick={handleLogout}
+              className="text-red-500 font-bold hover:text-red-600 hover:underline transition-all bg-transparent border-none p-0 cursor-pointer"
+            >
+              {t("profile.logoutLink") || "Log out"}
+            </button>
+          </p>
         </div>
       </div>
     </div>
@@ -145,21 +174,18 @@ const ProfileField = ({
   value,
   icon,
   isTextArea = false,
-}: {
-  label: string;
-  value: string;
-  icon?: React.ReactNode;
-  isTextArea?: boolean;
-}) => (
+}: ProfileFieldProps) => (
   <div className="group">
     <label className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-2 px-1">
       {icon && <span className="text-green-500/80">{icon}</span>}
       {label}
     </label>
     <div
-      className={`w-full p-4 bg-gray-50/50 border border-gray-100 rounded-2xl text-gray-700 text-sm font-medium ${isTextArea ? "italic leading-relaxed" : ""}`}
+      className={`w-full p-4 bg-gray-50/50 border border-gray-100 rounded-2xl text-gray-700 text-sm font-medium ${
+        isTextArea ? "italic leading-relaxed" : ""
+      }`}
     >
-      {value}
+      {value || "—"}
     </div>
   </div>
 );
