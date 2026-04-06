@@ -4,78 +4,85 @@ import { useState, useEffect } from "react";
 import SearchBar from "../components/SearchBar";
 import CategoryFilter from "../components/CategoryFilter";
 import DonationGrid from "../components/DonationGrid";
+import { AlertCircle, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import type { DonationItem } from "../components/DonationCard";
-import type { Category } from "../components/CategoryFilter";
 
-export default function BrowseDonations() {
+const BASE_URL = "https://material-donation-backend-3.onrender.com";
+const ITEMS_PER_PAGE = 10;
+
+export default function Browse() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [donations, setDonations] = useState<DonationItem[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const getAuthHeader = () => {
+    const token = localStorage.getItem("token");
+    return token ? { "Authorization": `Bearer ${token}` } : undefined;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-      
       try {
-        // Fetching both endpoints
-        const [catRes, donRes] = await Promise.all([
-          fetch("https://material-donation-backend-3.onrender.com/api/categories"),
-          fetch("https://material-donation-backend-3.onrender.com/api/v1/donations")
-        ]);
-
-        if (!catRes.ok || !donRes.ok) {
-          throw new Error(`Server responded with error: ${donRes.status}`);
-        }
-
+        // 1. Fetch Categories from the correct endpoint with Auth
+        const catRes = await fetch(`${BASE_URL}/api/categories`, { 
+          headers: getAuthHeader() 
+        });
         const catData = await catRes.json();
-        const donData = await donRes.json();
+        const catList = Array.isArray(catData) ? catData : (catData.content || []);
+        setCategories(catList);
 
-        // 1. Handle Categories
-        const finalCats = Array.isArray(catData) ? catData : (catData.data || []);
-        setCategories(finalCats);
-
-        // 2. Handle Donations & Map to Component Props
-        // Check if data is nested inside a 'data' property (common in Express/Mongoose)
-        const rawDonations = Array.isArray(donData) ? donData : (donData.data || []);
+        // 2. Fetch Donations
+        const donRes = await fetch(`${BASE_URL}/api/v1/donations`, { 
+          headers: getAuthHeader() 
+        });
         
-        const formattedDonations: DonationItem[] = rawDonations.map((item: any) => ({
-          id: item._id || item.id, // Support both MongoDB _id and standard id
-          title: item.title || "Untitled",
-          location: item.location || "Cambodia",
+        if (!donRes.ok) throw new Error("Failed to fetch donations");
+        
+        const donData = await donRes.json();
+        const items = Array.isArray(donData) ? donData : (donData.content || []);
+
+        const mappedItems = items.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          location: item.location || "Unknown",
           time: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "Recently",
-          category: typeof item.category === 'object' ? item.category.name : (item.category || "General"),
-          condition: item.condition || "Good",
-          image: item.images?.[0] || item.image || "https://via.placeholder.com/400",
+          category: item.category?.name || "General", 
+          condition: item.condition ? item.condition.replace(/_/g, " ") : "Good",
+          image: item.images?.[0]?.url || "https://images.unsplash.com/photo-1532622722190-68a516930ee0?w=400",
         }));
 
-        setDonations(formattedDonations);
+        setDonations(mappedItems);
       } catch (err: any) {
-        console.error("Fetch Error:", err);
-        setError("Could not load donations. Please try again later.");
+        setError(err.message);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
   const filteredItems = donations.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "All" || item.category === selectedCategory;
+    // Normalize strings for comparison to avoid "No items found" due to casing
+    const matchesCategory = 
+      selectedCategory === "All" || 
+      item.category.toLowerCase() === selectedCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-7xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-extrabold mb-6 text-center">Browse Donations</h1>
+  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+  const currentItems = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-12 max-w-3xl mx-auto justify-center">
+  return (
+    <div className="min-h-screen bg-gray-50 text-black">
+      <main className="max-w-7xl mx-auto px-4 py-12">
+        <div className="flex flex-col md:flex-row gap-4 mb-12 max-w-4xl mx-auto">
           <SearchBar value={searchTerm} onChange={setSearchTerm} />
           <CategoryFilter
             categories={categories}
@@ -85,26 +92,25 @@ export default function BrowseDonations() {
           />
         </div>
 
-        {/* Status Handling UI */}
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mb-4"></div>
-            <p className="text-gray-500">Connecting to server...</p>
-          </div>
+          <div className="flex justify-center py-20"><Loader2 className="animate-spin text-green-600" /></div>
         ) : error ? (
-          <div className="text-center py-10">
-            <p className="text-red-500 font-semibold mb-2">{error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="text-sm text-blue-600 underline"
-            >
-              Try Refreshing
-            </button>
-          </div>
+          <div className="text-center py-20 text-red-500">{error}</div>
         ) : filteredItems.length === 0 ? (
-          <p className="text-center text-gray-400 py-20">No items found matching your criteria.</p>
+          <div className="text-center py-20 text-gray-500">
+            No items found matching "{selectedCategory}"
+          </div>
         ) : (
-          <DonationGrid items={filteredItems} />
+          <>
+            <DonationGrid items={currentItems} />
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-8">
+                <button onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1} className="p-2 border rounded disabled:opacity-30"><ChevronLeft /></button>
+                <span className="font-bold">{currentPage} / {totalPages}</span>
+                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage === totalPages} className="p-2 border rounded disabled:opacity-30"><ChevronRight /></button>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>
