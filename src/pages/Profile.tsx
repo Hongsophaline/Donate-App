@@ -1,11 +1,12 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { User, MapPin, Calendar, Box, Mail, Phone, Edit3 } from "lucide-react";
 
-/**
- * Interface for ProfileField Props
- */
+/* --- Interfaces --- */
+
 interface ProfileFieldProps {
   label: string;
   value: string | number;
@@ -13,10 +14,55 @@ interface ProfileFieldProps {
   isTextArea?: boolean;
 }
 
+interface StatCardProps {
+  icon: React.ReactNode;
+  value: string | number;
+  label: string;
+}
+
+/* --- Internal Sub-Components --- */
+
+const StatCard = ({ icon, value, label }: StatCardProps) => (
+  <div className="bg-[#F8FAF9] p-5 rounded-2xl flex flex-col items-center text-center border border-gray-50 transition-transform hover:translate-y-[-2px]">
+    <div className="text-green-600 mb-2 p-2 bg-white rounded-lg shadow-sm">
+      {icon}
+    </div>
+    <span className="text-xl font-black text-gray-900">{value}</span>
+    <span className="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1">
+      {label}
+    </span>
+  </div>
+);
+
+const ProfileField = ({
+  label,
+  value,
+  icon,
+  isTextArea = false,
+}: ProfileFieldProps) => (
+  <div className="group">
+    <label className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-2 px-1">
+      {icon && <span className="text-green-500/80">{icon}</span>}
+      {label}
+    </label>
+    <div
+      className={`w-full p-4 bg-gray-50/50 border border-gray-100 rounded-2xl text-gray-700 text-sm font-medium ${
+        isTextArea ? "italic leading-relaxed" : ""
+      }`}
+    >
+      {value || "—"}
+    </div>
+  </div>
+);
+
+/* --- Main Component --- */
+
 const ProfilePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  // Note: In a real app, this would likely come from a useAuth hook or Redux/Context
   const userData = {
     name: "Sophaline Hong",
     email: "hong.sophaline@institute.com",
@@ -27,20 +73,43 @@ const ProfilePage = () => {
     donationCount: 12,
   };
 
-  const handleLogout = (e: React.MouseEvent) => {
+  const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
-    // Logic: Clear your tokens/auth state here
-    // Example: localStorage.removeItem("userToken");
+    setIsLoggingOut(true);
 
-    console.log("User logged out");
+    const token = localStorage.getItem("userToken");
 
-    // Redirecting to Sign Up page
-    navigate("/signup");
+    try {
+      // Only attempt API call if token exists
+      if (token) {
+        const res = await fetch(
+          "https://material-donation-backend-1.onrender.com/api/v1/auth/logout",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (!res.ok) {
+          console.error("Logout API rejected the request");
+        }
+      }
+    } catch (error) {
+      console.error("Network error during logout:", error);
+    } finally {
+      // ALWAYS clear local state regardless of server response
+      localStorage.removeItem("userToken");
+      setIsLoggingOut(false);
+      navigate("/signup");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] py-12 px-6">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-[#FDFCFB] py-12 px-6 flex items-center justify-center">
+      <div className="max-w-3xl w-full">
         {/* Header Section */}
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-gray-900 mb-1">
@@ -51,8 +120,6 @@ const ProfilePage = () => {
 
         {/* Main Profile Card */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="h-2 w-full "></div>
-
           <div className="p-8">
             {/* Top Info Area */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
@@ -130,15 +197,18 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* LOGOUT OUTSIDE THE BOX */}
+        {/* LOGOUT */}
         <div className="mt-8 text-center">
           <p className="text-gray-500 text-sm">
             {t("profile.logoutPrompt") || "Want to switch accounts?"}{" "}
             <button
               onClick={handleLogout}
-              className="text-red-500 font-bold hover:text-red-600 hover:underline transition-all bg-transparent border-none p-0 cursor-pointer"
+              disabled={isLoggingOut}
+              className="text-red-500 font-bold hover:text-red-600 hover:underline transition-all bg-transparent border-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {t("profile.logoutLink") || "Log out"}
+              {isLoggingOut
+                ? "Logging out..."
+                : t("profile.logoutLink") || "Log out"}
             </button>
           </p>
         </div>
@@ -146,48 +216,5 @@ const ProfilePage = () => {
     </div>
   );
 };
-
-/* --- Internal Components --- */
-
-const StatCard = ({
-  icon,
-  value,
-  label,
-}: {
-  icon: React.ReactNode;
-  value: string | number;
-  label: string;
-}) => (
-  <div className="bg-[#F8FAF9] p-5 rounded-2xl flex flex-col items-center text-center border border-gray-50 transition-transform hover:translate-y-[-2px]">
-    <div className="text-green-600 mb-2 p-2 bg-white rounded-lg shadow-sm">
-      {icon}
-    </div>
-    <span className="text-xl font-black text-gray-900">{value}</span>
-    <span className="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1">
-      {label}
-    </span>
-  </div>
-);
-
-const ProfileField = ({
-  label,
-  value,
-  icon,
-  isTextArea = false,
-}: ProfileFieldProps) => (
-  <div className="group">
-    <label className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-2 px-1">
-      {icon && <span className="text-green-500/80">{icon}</span>}
-      {label}
-    </label>
-    <div
-      className={`w-full p-4 bg-gray-50/50 border border-gray-100 rounded-2xl text-gray-700 text-sm font-medium ${
-        isTextArea ? "italic leading-relaxed" : ""
-      }`}
-    >
-      {value || "—"}
-    </div>
-  </div>
-);
 
 export default ProfilePage;
