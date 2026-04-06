@@ -1,197 +1,201 @@
 "use client";
 
 import React, { useState } from "react";
-import { Camera, MapPin, Upload, ChevronDown, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // FIX: Use useNavigate for Vite/React
+import { Camera, MapPin, Upload, ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface FormData {
   title: string;
-  categoryId: string;
+  category: string;
   description: string;
   location: string;
-  condition: string;
-  quantity: number;
 }
 
 export default function DonatePage() {
-  const navigate = useNavigate(); // FIX: Navigation hook
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState<FormData>({
     title: "",
-    categoryId: "5a1af0ba-8ace-4198-931e-b29387e9ff5d", // Example UUID from your JSON
+    category: "",
     description: "",
     location: "",
-    condition: "LIKE_NEW",
-    quantity: 1,
   });
-  
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ 
-      ...prev, 
-      [name]: name === "quantity" ? parseInt(value) || 1 : value 
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setSelectedImages(Array.from(e.target.files));
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setStatusMessage(null);
-
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setStatusMessage({ type: 'error', text: "Please log in first." });
-      setIsSubmitting(false);
-      return;
-    }
-
-    try {
-      // STEP 1: Create Donation Listing
-      const response = await fetch("https://material-donation-backend-3.onrender.com/api/v1/donations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, 
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create donation.");
-      }
-
-      const result = await response.json();
-      const donationId = result.id; 
-
-      // STEP 2: Upload Images (Sequential)
-      if (selectedImages.length > 0 && donationId) {
-        for (const file of selectedImages) {
-          const imageData = new FormData();
-          imageData.append("file", file); // Backend expects "file"
-
-          try {
-            const imgRes = await fetch(`https://material-donation-backend-3.onrender.com/api/v1/donations/${donationId}/images`, {
-              method: "POST",
-              headers: { "Authorization": `Bearer ${token}` },
-              body: imageData,
-            });
-            if (!imgRes.ok) console.error("Image upload failed for one file");
-          } catch (err) {
-            console.error("Image upload error:", err);
-          }
-        }
-      }
-
-      // STEP 3: Success and Redirect
-      setStatusMessage({ type: 'success', text: "Donation posted! Redirecting to browse..." });
-      
-      setTimeout(() => {
-        navigate("/browse"); // FIX: Standard React redirect
-      }, 2000);
-
-    } catch (error: any) {
-      console.error("Submission Error:", error);
-      setStatusMessage({ type: 'error', text: error.message || "An error occurred." });
-      setIsSubmitting(false);
-    }
+    console.log("Form Submitted!", { ...formData, images: selectedImages });
+    // TODO: call your API to submit the donation
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-4 font-sans">
-      <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white border border-gray-200 rounded-xl p-8 space-y-6 shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-900">List an Item</h1>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="text-center mb-8 max-w-2xl">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">
+          {t("donate.title", "Donate Your Items")}
+        </h1>
+        <p className="text-gray-600 text-sm sm:text-base">
+          {t(
+            "donate.subtitle",
+            "Fill in the details below to list your items for donation.",
+          )}
+        </p>
+      </div>
 
-        {statusMessage && (
-          <div className={`p-4 rounded-lg flex items-center gap-3 ${
-            statusMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'
-          }`}>
-            {statusMessage.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-            {statusMessage.text}
-          </div>
-        )}
+      {/* Form */}
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md md:max-w-2xl bg-white border border-gray-200 rounded-xl p-6 md:p-8 space-y-6 shadow-sm"
+      >
+        {/* Item Title */}
+        <div className="flex flex-col space-y-1.5">
+          <label className="text-sm font-medium text-gray-700">
+            {t("donate.fields.title", "Item Title")}
+          </label>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleInputChange}
+            placeholder={t(
+              "donate.placeholders.title",
+              "e.g., Winter jacket, like new",
+            )}
+            className="w-full p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            required
+          />
+        </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-semibold mb-1">Title</label>
-            <input type="text" name="title" value={formData.title} onChange={handleInputChange} className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" required />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold mb-1">Condition</label>
-              <select name="condition" value={formData.condition} onChange={handleInputChange} className="w-full p-3 border rounded-lg bg-white">
-                <option value="NEW">New</option>
-                <option value="LIKE_NEW">Like New</option>
-                <option value="GOOD">Good</option>
-                <option value="FAIR">Fair</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold mb-1">Quantity</label>
-              <input type="number" name="quantity" value={formData.quantity} onChange={handleInputChange} className="w-full p-3 border rounded-lg" min="1" />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">Category ID</label>
-            <input 
-              type="text" 
-              name="categoryId" 
-              value={formData.categoryId} 
-              onChange={handleInputChange} 
-              placeholder="Enter UUID"
-              className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" 
-              required 
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">Description</label>
-            <textarea name="description" value={formData.description} onChange={handleInputChange} rows={3} className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" required />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">Photos</label>
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-all">
-              <Camera className="text-gray-400 mb-2" />
-              <span className="text-sm text-gray-500">
-                {selectedImages.length > 0 ? `${selectedImages.length} images selected` : "Click to upload"}
-              </span>
-              <input type="file" multiple accept="image/*" onChange={(e) => e.target.files && setSelectedImages(Array.from(e.target.files))} className="hidden" />
-            </label>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">Location</label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
-              <input type="text" name="location" value={formData.location} onChange={handleInputChange} className="w-full pl-10 p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" required />
-            </div>
+        {/* Category */}
+        <div className="flex flex-col space-y-1.5">
+          <label className="text-sm font-medium text-gray-700">
+            {t("donate.fields.category", "Category Item")}
+          </label>
+          <div className="relative">
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleInputChange}
+              className="w-full p-3 border border-gray-300 rounded-md text-sm bg-white appearance-none pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              required
+            >
+              <option value="" disabled>
+                {t("donate.placeholders.category", "Select a Category")}
+              </option>
+              <option value="clothing">
+                {t("donate.categories.clothing", "Clothing")}
+              </option>
+              <option value="furniture">
+                {t("donate.categories.furniture", "Furniture")}
+              </option>
+              <option value="electronics">
+                {t("donate.categories.electronics", "Electronics")}
+              </option>
+              <option value="books">
+                {t("donate.categories.books", "Books")}
+              </option>
+            </select>
+            <ChevronDown className="absolute right-3 top-3.5 h-4 w-4 text-gray-400 pointer-events-none" />
           </div>
         </div>
 
+        {/* Description */}
+        <div className="flex flex-col space-y-1.5">
+          <label className="text-sm font-medium text-gray-700">
+            {t("donate.fields.description", "Description")}
+          </label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            placeholder={t(
+              "donate.placeholders.description",
+              "Describe the condition, size and any other detail",
+            )}
+            rows={4}
+            className="w-full p-3 border border-gray-300 rounded-md text-sm resize-none md:resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            required
+          />
+        </div>
+
+        {/* Photos */}
+        <div className="flex flex-col space-y-1.5">
+          <label className="text-sm font-medium text-gray-700">
+            {t("donate.fields.photos", "Photos")}
+          </label>
+          <label
+            htmlFor="photos"
+            className="flex flex-col items-center justify-center w-full sm:h-40 h-32 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+              <Camera className="h-8 w-8 text-gray-400 mb-2" />
+              <p className="text-sm text-gray-600">
+                {t("donate.placeholders.upload", "Click to upload photos")}
+              </p>
+              <p className="text-xs text-gray-400">
+                {t("donate.placeholders.uploadInfo", "PNG, JPG up to 5MB")}
+              </p>
+            </div>
+            <input
+              id="photos"
+              type="file"
+              multiple
+              accept="image/png, image/jpeg"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </label>
+          {selectedImages.length > 0 && (
+            <p className="text-xs text-gray-500 mt-1">
+              {t("donate.selectedImages", "Selected")}: {selectedImages.length}{" "}
+              {t("donate.images", "images")}
+            </p>
+          )}
+        </div>
+
+        {/* Location */}
+        <div className="flex flex-col space-y-1.5 relative">
+          <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            <MapPin className="h-4 w-4 text-gray-400" />
+          </span>
+          <input
+            type="text"
+            name="location"
+            value={formData.location}
+            onChange={handleInputChange}
+            placeholder={t(
+              "donate.placeholders.location",
+              "Enter your address or area",
+            )}
+            className="w-full pl-9 p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            required
+          />
+        </div>
+
+        {/* Submit Button */}
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="w-full flex items-center justify-center bg-green-600 text-white font-bold py-4 rounded-lg hover:bg-green-700 disabled:bg-gray-400 transition-all active:scale-[0.98]"
+          className="w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-md shadow-sm transition-colors"
         >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="animate-spin mr-2" />
-              Processing...
-            </>
-          ) : (
-            <>
-              <Upload className="mr-2" size={18} />
-              Submit Donation
-            </>
-          )}
+          <Upload className="mr-2 h-4 w-4" />
+          {t("donate.submit", "Submit Donation")}
         </button>
       </form>
     </div>

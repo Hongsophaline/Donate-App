@@ -4,11 +4,10 @@ import { useState, useEffect } from "react";
 import SearchBar from "../components/SearchBar";
 import CategoryFilter from "../components/CategoryFilter";
 import DonationGrid from "../components/DonationGrid";
-import { AlertCircle, Loader2 } from "lucide-react";
 import type { DonationItem } from "../components/DonationCard";
 import type { Category } from "../components/CategoryFilter";
 
-export default function Browse() {
+export default function BrowseDonations() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [donations, setDonations] = useState<DonationItem[]>([]);
@@ -16,79 +15,55 @@ export default function Browse() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Helper to get token
-  const getAuthHeader = () => {
-    const token = localStorage.getItem("token");
-    return token ? { "Authorization": `Bearer ${token}` } : {};
-  };
-
-  // 1. Fetch Categories
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("https://material-donation-backend-3.onrender.com/api/categories", {
-          headers: getAuthHeader() // Added auth check
-        });
-        
-        if (!res.ok) throw new Error("Failed to load categories");
-        
-        const data = await res.json();
-        // Handle nested 'data' or 'content' keys
-        const categoryList = Array.isArray(data) ? data : (data.data || data.content || []);
-        setCategories(categoryList);
-      } catch (err) {
-        console.error("Categories fetch error:", err);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  // 2. Fetch Actual Donations from Backend
-  useEffect(() => {
-    const fetchDonations = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       setError(null);
+      
       try {
-        const res = await fetch("https://material-donation-backend-3.onrender.com/api/v1/donations", {
-          headers: getAuthHeader() // FIX: Added Auth header to resolve 403 Forbidden
-        });
-        
-        if (!res.ok) {
-           if (res.status === 403) throw new Error("Please log in to view donations.");
-           throw new Error("Could not fetch donations from server.");
+        // Fetching both endpoints
+        const [catRes, donRes] = await Promise.all([
+          fetch("https://material-donation-backend-3.onrender.com/api/categories"),
+          fetch("https://material-donation-backend-3.onrender.com/api/v1/donations")
+        ]);
+
+        if (!catRes.ok || !donRes.ok) {
+          throw new Error(`Server responded with error: ${donRes.status}`);
         }
+
+        const catData = await catRes.json();
+        const donData = await donRes.json();
+
+        // 1. Handle Categories
+        const finalCats = Array.isArray(catData) ? catData : (catData.data || []);
+        setCategories(finalCats);
+
+        // 2. Handle Donations & Map to Component Props
+        // Check if data is nested inside a 'data' property (common in Express/Mongoose)
+        const rawDonations = Array.isArray(donData) ? donData : (donData.data || []);
         
-        const responseData = await res.json();
-        
-        // FIX: Extract items based on common Spring Boot/Render backend patterns
-        const items = Array.isArray(responseData) 
-          ? responseData 
-          : (responseData.data || responseData.content || []);
-        
-        const mappedItems = items.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          location: item.location || "Unknown",
+        const formattedDonations: DonationItem[] = rawDonations.map((item: any) => ({
+          id: item._id || item.id, // Support both MongoDB _id and standard id
+          title: item.title || "Untitled",
+          location: item.location || "Cambodia",
           time: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "Recently",
-          category: item.category?.name || item.categoryName || "General",
-          condition: item.condition ? item.condition.replace(/_/g, " ") : "Good",
-          image: item.images && item.images.length > 0 
-            ? item.images[0].url 
-            : "https://images.unsplash.com/photo-1532622722190-68a516930ee0?auto=format&fit=crop&w=400&q=80",
+          category: typeof item.category === 'object' ? item.category.name : (item.category || "General"),
+          condition: item.condition || "Good",
+          image: item.images?.[0] || item.image || "https://via.placeholder.com/400",
         }));
 
-        setDonations(mappedItems);
+        setDonations(formattedDonations);
       } catch (err: any) {
-        setError(err.message);
+        console.error("Fetch Error:", err);
+        setError("Could not load donations. Please try again later.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchDonations();
+    fetchData();
   }, []);
 
-  // Filter logic
   const filteredItems = donations.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "All" || item.category === selectedCategory;
@@ -98,12 +73,9 @@ export default function Browse() {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-12">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-4">Browse Donations</h1>
-          <p className="text-gray-600">Discover items available for donation in your community.</p>
-        </div>
+        <h1 className="text-3xl font-extrabold mb-6 text-center">Browse Donations</h1>
 
-        <div className="flex flex-col md:flex-row gap-4 mb-12 max-w-4xl mx-auto">
+        <div className="flex flex-col sm:flex-row gap-4 mb-12 max-w-3xl mx-auto justify-center">
           <SearchBar value={searchTerm} onChange={setSearchTerm} />
           <CategoryFilter
             categories={categories}
@@ -113,26 +85,24 @@ export default function Browse() {
           />
         </div>
 
+        {/* Status Handling UI */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="h-10 w-10 animate-spin text-green-600 mb-4" />
-            <p className="text-gray-500 font-medium">Loading items...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mb-4"></div>
+            <p className="text-gray-500">Connecting to server...</p>
           </div>
         ) : error ? (
-          <div className="text-center py-20 bg-white rounded-xl border border-gray-200 shadow-sm max-w-md mx-auto">
-            <AlertCircle className="mx-auto h-12 w-12 text-red-400 mb-4" />
-            <p className="text-red-600 font-semibold px-4">{error}</p>
+          <div className="text-center py-10">
+            <p className="text-red-500 font-semibold mb-2">{error}</p>
             <button 
               onClick={() => window.location.reload()} 
-              className="mt-6 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="text-sm text-blue-600 underline"
             >
-              Try Again
+              Try Refreshing
             </button>
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-500 text-lg">No items found matching your criteria.</p>
-          </div>
+          <p className="text-center text-gray-400 py-20">No items found matching your criteria.</p>
         ) : (
           <DonationGrid items={filteredItems} />
         )}
