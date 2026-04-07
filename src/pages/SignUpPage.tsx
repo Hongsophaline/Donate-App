@@ -15,8 +15,10 @@ interface SignUpForm {
 const SignUpPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
-  const [userType, setUserType] = useState<"individual" | "organization">("individual");
+
+  const [userType, setUserType] = useState<"individual" | "organization">(
+    "individual",
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -73,53 +75,61 @@ const SignUpPage: React.FC = () => {
     }
 
     // 2. Prepare Payloads exactly as requested
-    const payload = userType === "individual" 
-      ? {
-          fullName: formData.fullName,
-          phone: formData.phone,
-          password: formData.password,
-          userType: "INDIVIDUAL",
-          dob: formData.dateOfBirth,
-          avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=individual" // Default string
-        }
-      : {
-          fullName: formData.fullName,
-          phone: formData.phone,
-          email: formData.organizationEmail,
-          password: formData.password,
-          userType: "Organization",
-          avatarUrl: "https://api.dicebear.com/7.x/initials/svg?seed=org" // Default string
-        };
+    const payload =
+      userType === "individual"
+        ? {
+            fullName: formData.fullName,
+            phone: formData.phone,
+            password: formData.password,
+            userType: "INDIVIDUAL",
+            dob: formData.dateOfBirth,
+            avatarUrl:
+              "https://api.dicebear.com/7.x/avataaars/svg?seed=individual", // Default string
+          }
+        : {
+            fullName: formData.fullName,
+            phone: formData.phone,
+            email: formData.organizationEmail,
+            password: formData.password,
+            userType: "Organization",
+            avatarUrl: "https://api.dicebear.com/7.x/initials/svg?seed=org", // Default string
+          };
 
     console.log("--- Request Started ---");
-    console.log("Target URL: https://material-donation-backend-3.onrender.com/api/v1/auth/register");
+    console.log(
+      "Target URL: https://material-donation-backend-4.onrender.com/api/v1/auth/register",
+    );
     console.log("Payload being sent:", payload);
 
     // 3. Fetch API
     try {
-      const response = await fetch("https://material-donation-backend-3.onrender.com/api/v1/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://material-donation-backend-4.onrender.com/api/v1/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
         // This catches the 400 Bad Request you saw in your screenshot
         console.error("Registration Failed (Server Response):", data);
-        throw new Error(data.message || "Registration failed. Check console for details.");
+        throw new Error(
+          data.message || "Registration failed. Check console for details.",
+        );
       }
 
       // SUCCESS: Log data to console
       console.log("--- Registration Success! ---");
       console.log("Response Data:", data);
-      
-      alert("Account created successfully!");
-      navigate("/login"); 
 
+      alert("Account created successfully!");
+      navigate("/login");
     } catch (err: any) {
       console.error("Catch Block Error:", err);
       setError(err.message || "An unexpected error occurred.");
@@ -127,7 +137,6 @@ const SignUpPage: React.FC = () => {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center py-12 px-4">
@@ -143,7 +152,9 @@ const SignUpPage: React.FC = () => {
             disabled={isLoading}
             onClick={() => setUserType("individual")}
             className={`w-1/2 py-2 text-sm font-medium rounded-md transition ${
-              userType === "individual" ? "bg-white shadow text-gray-900" : "text-gray-500"
+              userType === "individual"
+                ? "bg-white shadow text-gray-900"
+                : "text-gray-500"
             }`}
           >
             {t("signup.individual")}
@@ -154,7 +165,9 @@ const SignUpPage: React.FC = () => {
             disabled={isLoading}
             onClick={() => setUserType("organization")}
             className={`w-1/2 py-2 text-sm font-medium rounded-md transition ${
-              userType === "organization" ? "bg-white shadow text-gray-900" : "text-gray-500"
+              userType === "organization"
+                ? "bg-white shadow text-gray-900"
+                : "text-gray-500"
             }`}
           >
             {t("signup.organization")}
@@ -164,7 +177,9 @@ const SignUpPage: React.FC = () => {
         <form onSubmit={handleSubmit} className="w-full space-y-6">
           {/* Full Name */}
           <div className="flex flex-col space-y-1.5">
-            <label className="text-xs text-gray-500 font-medium">{t("signup.fullName")}</label>
+            <label className="text-xs text-gray-500 font-medium">
+              {t("signup.fullName")}
+            </label>
             <input
               type="text"
               name="fullName"
@@ -178,7 +193,9 @@ const SignUpPage: React.FC = () => {
 
           {/* Phone */}
           <div className="flex flex-col space-y-1.5">
-            <label className="text-xs text-gray-500 font-medium">{t("signup.phone")}</label>
+            <label className="text-xs text-gray-500 font-medium">
+              {t("signup.phone")}
+            </label>
             <input
               type="tel"
               name="phone"
@@ -193,7 +210,9 @@ const SignUpPage: React.FC = () => {
           {/* Conditional Field: Date of Birth (Individual) */}
           {userType === "individual" && (
             <div className="flex flex-col space-y-1.5">
-              <label className="text-xs text-gray-500 font-medium">{t("signup.dob")}</label>
+              <label className="text-xs text-gray-500 font-medium">
+                {t("signup.dob")}
+              </label>
               <input
                 type="date"
                 name="dateOfBirth"
@@ -208,7 +227,9 @@ const SignUpPage: React.FC = () => {
           {/* Conditional Field: Org Email (Organization) */}
           {userType === "organization" && (
             <div className="flex flex-col space-y-1.5">
-              <label className="text-xs text-gray-500 font-medium">{t("signup.orgEmail")}</label>
+              <label className="text-xs text-gray-500 font-medium">
+                {t("signup.orgEmail")}
+              </label>
               <input
                 type="email"
                 name="organizationEmail"
@@ -221,10 +242,11 @@ const SignUpPage: React.FC = () => {
             </div>
           )}
 
-
           {/* Password */}
           <div className="flex flex-col space-y-1.5">
-            <label className="text-xs text-gray-500 font-medium">{t("signup.password")}</label>
+            <label className="text-xs text-gray-500 font-medium">
+              {t("signup.password")}
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -245,12 +267,16 @@ const SignUpPage: React.FC = () => {
           </div>
 
           {/* Error Message Display */}
-          {error && <p className="text-red-500 text-xs font-medium bg-red-50 p-2 rounded border border-red-100">{error}</p>}
+          {error && (
+            <p className="text-red-500 text-xs font-medium bg-red-50 p-2 rounded border border-red-100">
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full mt-2 py-3 ${isLoading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'} text-white font-semibold text-sm rounded-md shadow-sm transition-colors`}
+            className={`w-full mt-2 py-3 ${isLoading ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"} text-white font-semibold text-sm rounded-md shadow-sm transition-colors`}
           >
             {isLoading ? "Signing up..." : t("signup.button")}
           </button>
@@ -258,7 +284,10 @@ const SignUpPage: React.FC = () => {
 
         <div className="mt-6 text-xs text-gray-600">
           {t("signup.alreadyHaveAccount")}{" "}
-          <Link to="/login" className="text-blue-500 underline hover:text-blue-600">
+          <Link
+            to="/login"
+            className="text-blue-500 underline hover:text-blue-600"
+          >
             {t("signup.loginLink")}
           </Link>
         </div>
