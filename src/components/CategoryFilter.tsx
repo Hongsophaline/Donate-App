@@ -23,7 +23,7 @@ export default function CategoryFilter({
     <div className="relative w-full text-black">
       <select
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)} // This sends cat.name to setSelectedCategory
         disabled={isLoading}
         className="w-full pl-4 pr-10 py-2.5 border rounded-md text-sm appearance-none focus:outline-none focus:ring-1 focus:border-green-500 disabled:bg-gray-100"
       >
@@ -31,6 +31,7 @@ export default function CategoryFilter({
           {isLoading ? "Loading..." : "All Categories"}
         </option>
         {categories.map((cat) => (
+          // FIXED: Value must be cat.name to match the item.category.name in Browse.tsx
           <option key={cat.id} value={cat.name}>
             {cat.name}
           </option>
@@ -40,3 +41,4 @@ export default function CategoryFilter({
     </div>
   );
 }
+ 

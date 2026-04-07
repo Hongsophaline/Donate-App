@@ -70,13 +70,17 @@ const mappedItems = items.map((item: any) => ({
     fetchData();
   }, []);
 
-  // Filter donations by search term and selected category
-  const filteredItems = donations.filter((item) => {
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || item.category.toLowerCase() === selectedCategory.toLowerCase();
-    return matchesSearch && matchesCategory;
-  });
+ // Find this section in your Browse.tsx and replace it:
+const filteredItems = donations.filter((item) => {
+  const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
+  
+  // FIXED: Ensure we are comparing the category name correctly
+  const matchesCategory =
+    selectedCategory === "All" || 
+    item.category.trim().toLowerCase() === selectedCategory.trim().toLowerCase();
+    
+  return matchesSearch && matchesCategory;
+});
 
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
   const currentItems = filteredItems.slice(
