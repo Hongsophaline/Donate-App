@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // 1. Import useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Eye, EyeOff } from "lucide-react";
+import Cookies from "js-cookie"; // <-- import js-cookie
 
 const LoginPage: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate(); // 2. Initialize the navigate function
+  const navigate = useNavigate();
 
   const [phone, setPhone] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -34,15 +35,16 @@ const LoginPage: React.FC = () => {
         throw new Error(data.message || "Invalid credentials");
       }
 
-      // 3. Save the token so the user stays logged in
+      // ✅ Store token in cookies instead of localStorage
       if (data.token) {
-        localStorage.setItem("token", data.token);
-        // Optional: Save user info if your API returns it
-        // localStorage.setItem("user", JSON.stringify(data.user));
+        Cookies.set("token", data.token, {
+          expires: 7, // 7 days expiration
+          secure: true, // send only over HTTPS
+          sameSite: "Strict", // CSRF protection
+        });
       }
 
-      // 4. DIRECT REDIRECT TO HOME PAGE
-      // Replace "/" with your actual home route path (e.g., "/home" or "/dashboard")
+      // Redirect to home
       navigate("/");
     } catch (err: any) {
       setError(err.message || "Something went wrong.");
@@ -100,7 +102,9 @@ const LoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full mt-4 py-3 ${isLoading ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"} text-white font-semibold text-sm rounded-md shadow-sm transition-colors`}
+            className={`w-full mt-4 py-3 ${
+              isLoading ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
+            } text-white font-semibold text-sm rounded-md shadow-sm transition-colors`}
           >
             {isLoading ? "Checking..." : t("login.button") || "Login"}
           </button>
