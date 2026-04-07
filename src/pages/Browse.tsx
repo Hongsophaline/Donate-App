@@ -46,6 +46,36 @@ const DUMMY_ITEMS: DonationItem[] = [
     image:
       "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80",
   },
+  {
+    id: 4,
+    title: "Winter Jacket - Size M",
+    location: "Phnom Penh",
+    time: "2 hours ago",
+    category: "Clothing",
+    condition: "Like New",
+    image:
+      "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    id: 5,
+    title: "Wooden Bookshelf",
+    location: "Siem Reap",
+    time: "5 hours ago",
+    category: "Furniture",
+    condition: "Good",
+    image:
+      "https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=400&q=80",
+  },
+  {
+    id: 6,
+    title: "Children's Books (Set of 12)",
+    location: "Phnom Penh",
+    time: "1 hour ago",
+    category: "Books",
+    condition: "Good",
+    image:
+      "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80",
+  },
 ];
 
 export default function BrowseDonations() {

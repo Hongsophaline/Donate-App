@@ -1,11 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { User, MapPin, Calendar, Box, Mail, Phone, Edit3 } from "lucide-react";
+import Cookies from "js-cookie";
 
-/**
- * Interface for ProfileField Props
- */
 interface ProfileFieldProps {
   label: string;
   value: string | number;
@@ -13,35 +11,85 @@ interface ProfileFieldProps {
   isTextArea?: boolean;
 }
 
+interface UserData {
+  fullName: string;
+  email: string | null;
+  phone: string;
+  avatarUrl?: string;
+  dob?: string;
+  createdAt: string;
+  donationCount?: number;
+}
+
 const ProfilePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const userData = {
-    name: "Sophaline Hong",
-    email: "hong.sophaline@institute.com",
-    phone: "+855 70 835 672",
-    location: "Phnom Penh, Cambodia",
-    bio: "Passionate about helping communities through donations. I believe small acts of kindness can change the world.",
-    joinedDate: "Mar 2026",
-    donationCount: 12,
-  };
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleLogout = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Logic: Clear your tokens/auth state here
-    // Example: localStorage.removeItem("userToken");
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = Cookies.get("token");
+        if (!token) throw new Error("No auth token found.");
 
-    console.log("User logged out");
+        const res = await fetch(
+          "https://material-donation-backend-3.onrender.com/api/v1/auth/profile",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
 
-    // Redirecting to Sign Up page
+        if (!res.ok) throw new Error("Failed to fetch profile data");
+
+        const data = await res.json();
+
+        setUserData({
+          fullName: data.fullName || "",
+          email: data.email,
+          phone: data.phone || "",
+          avatarUrl: data.avatarUrl,
+          dob: data.dob,
+          createdAt: data.createdAt,
+          donationCount: data.donationCount || 0,
+        });
+      } catch (err) {
+        console.error(err);
+        navigate("/signup");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
+
+  const handleLogout = () => {
+    Cookies.remove("token");
     navigate("/signup");
   };
+
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  if (!userData) return null;
+
+  const joinedDate = new Date(userData.createdAt).toLocaleString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] py-12 px-6">
       <div className="max-w-3xl mx-auto">
-        {/* Header Section */}
+        {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-gray-900 mb-1">
             {t("profile.title")}
@@ -49,23 +97,30 @@ const ProfilePage = () => {
           <p className="text-gray-500 text-sm">{t("profile.subtitle")}</p>
         </div>
 
-        {/* Main Profile Card */}
+        {/* Profile Card */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="h-2 w-full "></div>
-
           <div className="p-8">
-            {/* Top Info Area */}
+            {/* Top Info */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
               <div className="flex items-center gap-5">
-                <div className="w-20 h-20 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 border border-green-100 shadow-inner">
-                  <User size={40} />
+                <div className="w-20 h-20 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 border border-green-100 shadow-inner overflow-hidden">
+                  {userData.avatarUrl ? (
+                    <img
+                      src={userData.avatarUrl}
+                      alt="avatar"
+                      className="w-full h-full object-cover rounded-2xl"
+                    />
+                  ) : (
+                    <User size={40} />
+                  )}
                 </div>
                 <div>
                   <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                    {userData.name}
+                    {userData.fullName}
                   </h2>
                   <p className="text-gray-400 text-xs font-medium uppercase tracking-widest mt-1">
-                    {t("profile.memberSince")} {userData.joinedDate}
+                    {t("profile.memberSince")} {joinedDate}
                   </p>
                 </div>
               </div>
@@ -78,31 +133,31 @@ const ProfilePage = () => {
               </Link>
             </div>
 
-            {/* Stats Grid */}
+            {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
               <StatCard
                 icon={<Box size={22} />}
-                value={userData.donationCount}
+                value={userData.donationCount || 0}
                 label={t("profile.stats.donations")}
               />
               <StatCard
                 icon={<MapPin size={22} />}
-                value="Phnom Penh"
-                label={t("profile.stats.location")}
+                value={userData.dob || "—"}
+                label={t("profile.stats.dob")}
               />
               <StatCard
                 icon={<Calendar size={22} />}
-                value={userData.joinedDate}
+                value={joinedDate}
                 label={t("profile.stats.joined")}
               />
             </div>
 
-            {/* Information Rows */}
+            {/* Info Fields */}
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ProfileField
                   label={t("profile.labels.fullName")}
-                  value={userData.name}
+                  value={userData.fullName}
                   icon={<User size={16} />}
                 />
                 <ProfileField
@@ -113,24 +168,14 @@ const ProfilePage = () => {
               </div>
               <ProfileField
                 label={t("profile.labels.email")}
-                value={userData.email}
+                value={userData.email || "—"}
                 icon={<Mail size={16} />}
-              />
-              <ProfileField
-                label={t("profile.labels.location")}
-                value={userData.location}
-                icon={<MapPin size={16} />}
-              />
-              <ProfileField
-                label={t("profile.labels.bio")}
-                value={userData.bio}
-                isTextArea={true}
               />
             </div>
           </div>
         </div>
 
-        {/* LOGOUT OUTSIDE THE BOX */}
+        {/* Logout */}
         <div className="mt-8 text-center">
           <p className="text-gray-500 text-sm">
             {t("profile.logoutPrompt") || "Want to switch accounts?"}{" "}
@@ -146,8 +191,6 @@ const ProfilePage = () => {
     </div>
   );
 };
-
-/* --- Internal Components --- */
 
 const StatCard = ({
   icon,
@@ -181,9 +224,7 @@ const ProfileField = ({
       {label}
     </label>
     <div
-      className={`w-full p-4 bg-gray-50/50 border border-gray-100 rounded-2xl text-gray-700 text-sm font-medium ${
-        isTextArea ? "italic leading-relaxed" : ""
-      }`}
+      className={`w-full p-4 bg-gray-50/50 border border-gray-100 rounded-2xl text-gray-700 text-sm font-medium ${isTextArea ? "italic leading-relaxed" : ""}`}
     >
       {value || "—"}
     </div>
