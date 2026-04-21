@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
-import logoImg from "../assets/logo-footer.png"; // adjust path if needed
+import { useTranslation } from "react-i18next"; // 1. Import hook
+import logoImg from "../assets/logo-removebg-preview.png";
 
 const Footer = () => {
+  const { t } = useTranslation(); // 2. Initialize translation
+
   return (
     <footer className="bg-[#B33D11] text-white pt-12 pb-6 px-10">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
@@ -15,28 +18,27 @@ const Footer = () => {
             className="object-contain brightness-110"
           />
           <p className="text-sm leading-relaxed text-gray-200">
-            Connecting donors with charities and individuals in need. Reduce
-            waste, reuse items, build community.
+            {t("footer.description")}
           </p>
         </div>
 
         {/* Column 2: Platform */}
         <div>
-          <h3 className="font-bold text-lg mb-4">Platform</h3>
+          <h3 className="font-bold text-lg mb-4">{t("footer.platform")}</h3>
           <ul className="flex flex-col gap-3 text-sm text-gray-200">
             <li>
               <Link to="/donate" className="hover:underline">
-                Donate Items
+                {t("footer.donateItems")}
               </Link>
             </li>
             <li>
               <Link to="/browse" className="hover:underline">
-                Browse Donations
+                {t("footer.browseDonations")}
               </Link>
             </li>
             <li>
               <Link to="/how-it-works" className="hover:underline">
-                How It Works
+                {t("footer.howItWorks")}
               </Link>
             </li>
           </ul>
@@ -44,21 +46,21 @@ const Footer = () => {
 
         {/* Column 3: Support */}
         <div>
-          <h3 className="font-bold text-lg mb-4">Support</h3>
+          <h3 className="font-bold text-lg mb-4">{t("footer.support")}</h3>
           <ul className="flex flex-col gap-3 text-sm text-gray-200">
             <li>
               <Link to="/contact" className="hover:underline">
-                Contact Us
+                {t("footer.contactUs")}
               </Link>
             </li>
             <li>
               <Link to="/faq" className="hover:underline">
-                FAQ
+                {t("footer.faq")}
               </Link>
             </li>
             <li>
               <Link to="/help" className="hover:underline">
-                Help Center
+                {t("footer.helpCenter")}
               </Link>
             </li>
           </ul>
@@ -66,21 +68,21 @@ const Footer = () => {
 
         {/* Column 4: Legal */}
         <div>
-          <h3 className="font-bold text-lg mb-4">Legal</h3>
+          <h3 className="font-bold text-lg mb-4">{t("footer.legal")}</h3>
           <ul className="flex flex-col gap-3 text-sm text-gray-200">
             <li>
               <Link to="/privacy" className="hover:underline">
-                Privacy Policy
+                {t("footer.privacyPolicy")}
               </Link>
             </li>
             <li>
               <Link to="/terms" className="hover:underline">
-                Terms Of Service
+                {t("footer.termsOfService")}
               </Link>
             </li>
             <li>
               <Link to="/cookie" className="hover:underline">
-                Cookie Policy
+                {t("footer.cookiePolicy")}
               </Link>
             </li>
           </ul>
@@ -89,7 +91,7 @@ const Footer = () => {
 
       {/* Bottom Copyright Section */}
       <div className="mt-12 pt-6 border-t border-white/20 text-center text-sm text-gray-200">
-        <p>© 2026 GiveFlow. Made with ❤ by Hong Sophaline & Thoeun Mary</p>
+        <p>{t("footer.copyright")}</p>
       </div>
     </footer>
   );

@@ -1,6 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import hero from "../assets/hero-home.webp"; // adjust path to your assets
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import hero from "../assets/hero-home.webp";
 import {
   ClipboardList,
   Search,
@@ -17,98 +18,112 @@ import {
 } from "lucide-react";
 
 const HomePage: React.FC = () => {
-  // Features data
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  // AUTH LOGIC: Checks if a user is logged in (e.g., checking localStorage)
+  // Replace "user_token" with whatever key you use for your login session
+  const isLoggedIn = !!localStorage.getItem("user_token");
+
+  const handleGetStarted = () => {
+    if (isLoggedIn) {
+      navigate("/donate");
+    } else {
+      navigate("/signup");
+    }
+  };
+
   const features = [
     {
-      title: "Easy Item Listing",
+      title: t("home.features.easyListing"),
       icon: <ClipboardList size={24} />,
-      desc: "List your surplus items with ease for charities to find.",
+      desc: t("home.features.easyListingDesc"),
     },
     {
-      title: "Find Nearby Charities",
+      title: t("home.features.findCharities"),
       icon: <Search size={24} />,
-      desc: "Discover active local charities in your neighborhood.",
+      desc: t("home.features.findCharitiesDesc"),
     },
     {
-      title: "Schedule Pickup",
+      title: t("home.features.schedulePickup"),
       icon: <CalendarClock size={24} />,
-      desc: "Easily arrange a time for items to be collected.",
+      desc: t("home.features.schedulePickupDesc"),
     },
     {
-      title: "Track Your Impact",
+      title: t("home.features.trackImpact"),
       icon: <LineChart size={24} />,
-      desc: "See exactly how your donations are helping people.",
+      desc: t("home.features.trackImpactDesc"),
     },
     {
-      title: "Real-time Notifications",
+      title: t("home.features.notifications"),
       icon: <Bell size={24} />,
-      desc: "Stay updated on your donation status instantly.",
+      desc: t("home.features.notificationsDesc"),
     },
     {
-      title: "Rate & Review",
+      title: t("home.features.rateReview"),
       icon: <Star size={24} />,
-      desc: "Share your experience and build trust in the community.",
+      desc: t("home.features.rateReviewDesc"),
     },
   ];
 
-  // Categories data
   const categories = [
-    { name: "Clothing", icon: <Shirt size={32} /> },
-    { name: "Furniture", icon: <Sofa size={32} /> },
-    { name: "Books", icon: <Book size={32} /> },
-    { name: "Electronics", icon: <Laptop size={32} /> },
-    { name: "Baby & Kids", icon: <Baby size={32} /> },
-    { name: "Others", icon: <Boxes size={32} /> },
+    { name: t("home.categories.clothing"), icon: <Shirt size={32} /> },
+    { name: t("home.categories.furniture"), icon: <Sofa size={32} /> },
+    { name: t("home.categories.books"), icon: <Book size={32} /> },
+    { name: t("home.categories.electronics"), icon: <Laptop size={32} /> },
+    { name: t("home.categories.baby"), icon: <Baby size={32} /> },
+    { name: t("home.categories.others"), icon: <Boxes size={32} /> },
   ];
 
-  // How it works steps
   const steps = [
     {
       id: "01",
-      title: "Create an Account",
-      desc: "Join our community by creating a simple profile.",
+      title: t("home.steps.createAccount.title"),
+      desc: t("home.steps.createAccount.desc"),
     },
     {
       id: "02",
-      title: "List or Browse Items",
-      desc: "Post items you want to give or find things you need.",
+      title: t("home.steps.listBrowse.title"),
+      desc: t("home.steps.listBrowse.desc"),
     },
     {
       id: "03",
-      title: "Connect & Schedule",
-      desc: "Message directly and set a pickup or drop-off time.",
+      title: t("home.steps.connectSchedule.title"),
+      desc: t("home.steps.connectSchedule.desc"),
     },
     {
       id: "04",
-      title: "Make an Impact",
-      desc: "Help the environment and someone in your community.",
+      title: t("home.steps.makeImpact.title"),
+      desc: t("home.steps.makeImpact.desc"),
     },
   ];
 
   return (
     <div className="overflow-x-hidden">
       {/* Hero Section */}
-      <section className="flex flex-col md:flex-row items-center justify-between px-10 md:px-20 py-16 gap-10">
-        <div className="flex-1 space-y-6">
-          <span className="text-[#B33D11] bg-[#FDF2F0] px-4 rounded-full text-sm font-semibold bottom-5 relative">
-            Connecting people with each other
+      <section className="flex flex-col-reverse md:flex-row items-center justify-between px-6 md:px-20 py-12 md:py-16 gap-8 md:gap-16">
+        <div className="flex-1 space-y-4 md:space-y-6 text-center md:text-left">
+          <span className="text-[#B33D11] bg-[#FDF2F0] px-3 py-1 rounded-full text-sm font-semibold">
+            {t("home.hero.tagline")}
           </span>
-          <h1 className="text-5xl font-bold leading-tight text-gray-900">
-            Give What You Have, <br />
-            <span className="text-[#B33D11]">Change a Life</span>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-gray-900">
+            {t("home.hero.titlePart1")}
+            <br />
+            <span className="text-[#B33D11]">{t("home.hero.titlePart2")}</span>
           </h1>
-          <p className="text-gray-600 text-lg max-w-md">
-            Donate clothes, furniture, books, and more to local charities and
-            individuals in need. Help us reduce waste and build a stronger
-            community.
+          <p className="text-gray-600 text-base sm:text-lg max-w-full md:max-w-md mx-auto md:mx-0">
+            {t("home.hero.desc")}
           </p>
-          <div className="flex gap-4">
-            <button className="bg-[#B33D11] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#96320e] transition-all">
-              Get Starting →
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start">
+            <button
+              onClick={handleGetStarted}
+              className="bg-[#B33D11] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#96320e] transition-all"
+            >
+              {t("home.hero.getStarted")}
             </button>
             <Link to="/how-it-works">
-              <button className="border border-gray-300 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
-                How it works
+              <button className="border border-gray-300 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+                {t("home.hero.howItWorks")}
               </button>
             </Link>
           </div>
@@ -116,27 +131,29 @@ const HomePage: React.FC = () => {
         <div className="flex-1">
           <img
             src={hero}
-            alt="Donation Boxes"
+            alt={t("home.hero.alt")}
             className="rounded-2xl shadow-xl object-cover w-full h-auto"
           />
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="bg-[#F9F9F9] py-20 px-10">
+      <section className="bg-[#F9F9F9] py-12 md:py-16 px-6 md:px-20">
         <div className="max-w-6xl mx-auto text-center">
-          <h4 className="text-[#B33D11] font-bold mb-2">Features</h4>
-          <h2 className="text-4xl font-bold mb-12">
-            Everything You Need to Give Back
+          <h4 className="text-[#B33D11] font-bold mb-2">
+            {t("home.features.title")}
+          </h4>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 md:mb-12">
+            {t("home.features.subtitle")}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {features.map((f, i) => (
               <div
                 key={i}
-                className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-left hover:shadow-md transition-all"
+                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-left hover:shadow-md transition-all"
               >
-                <div className="text-gray-700 mb-4">{f.icon}</div>
-                <h3 className="font-bold text-lg mb-2">{f.title}</h3>
+                <div className="text-gray-700 mb-3">{f.icon}</div>
+                <h3 className="font-bold text-lg mb-1">{f.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">
                   {f.desc}
                 </p>
@@ -147,18 +164,22 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Categories Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto text-center px-10">
-          <h4 className="text-[#B33D11] font-bold mb-2">Categories</h4>
-          <h2 className="text-4xl font-bold mb-12">What Can You Donate?</h2>
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+      <section className="py-12 md:py-20 bg-white">
+        <div className="max-w-6xl mx-auto text-center px-4">
+          <h4 className="text-[#B33D11] font-bold mb-2">
+            {t("home.categories.title")}
+          </h4>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-8">
+            {t("home.categories.subtitle")}
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
             {categories.map((c, i) => (
               <div
                 key={i}
                 className="border border-gray-200 rounded-lg p-6 flex flex-col items-center gap-3 hover:border-[#B33D11] hover:text-[#B33D11] transition-all cursor-pointer"
               >
-                <div className="text-gray-600">{c.icon}</div>
-                <span className="font-bold text-sm text-black">{c.name}</span>
+                {c.icon}
+                <span className="font-bold text-sm">{c.name}</span>
               </div>
             ))}
           </div>
@@ -166,15 +187,17 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 px-10 text-center">
+      <section className="py-12 md:py-20 px-6 text-center">
         <h4 className="text-[#B33D11] font-bold mb-2 uppercase tracking-widest text-sm">
-          How it works
+          {t("home.steps.title")}
         </h4>
-        <h2 className="text-4xl font-bold mb-16 italic">Four Simple Steps</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-12 italic">
+          {t("home.steps.subtitle")}
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
           {steps.map((step) => (
-            <div key={step.id} className="space-y-4">
-              <span className="text-5xl font-extrabold text-[#B33D11]/10 block">
+            <div key={step.id} className="space-y-4 text-left md:text-center">
+              <span className="text-4xl font-extrabold text-[#38C1E2] block">
                 {step.id}
               </span>
               <h3 className="font-bold text-xl">{step.title}</h3>

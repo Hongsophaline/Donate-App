@@ -1,0 +1,234 @@
+{
+  "navbar": {
+    "home": "首页",
+    "donate": "捐赠",
+    "browse": "浏览物品",
+    "howItWorks": "运作流程",
+    "contact": "联系我们",
+    "login": "登录",
+    "signUp": "注册",
+    "notifications": "通知",
+    "profile": "个人资料"
+  },
+  "home": {
+    "hero": {
+      "tagline": "连接你我，传递爱心",
+      "titlePart1": "分享所有，",
+      "titlePart2": "改变生命",
+      "desc": "将衣物、家具、书籍等捐赠给当地慈善机构和有需要的人。帮助我们减少浪费，建设更强大的社区。",
+      "getStarted": "立即开始 →",
+      "howItWorks": "运作流程",
+      "alt": "捐赠箱"
+    },
+    "features": {
+      "title": "平台功能",
+      "subtitle": "提供回馈社会所需的一切",
+      "easyListing": "便捷发布物品",
+      "easyListingDesc": "轻松列出您的闲置物品，方便慈善机构查找。",
+      "findCharities": "寻找附近慈善机构",
+      "findCharitiesDesc": "发现您附近活跃的本地慈善机构。",
+      "schedulePickup": "预约取货",
+      "schedulePickupDesc": "轻松安排物品收集的时间。",
+      "trackImpact": "追踪您的影响力",
+      "trackImpactDesc": "清楚地看到您的捐赠如何帮助他人。",
+      "notifications": "实时通知",
+      "notificationsDesc": "即时获取捐赠状态的最新消息。",
+      "rateReview": "评价与反馈",
+      "rateReviewDesc": "分享您的体验，建立社区信任。"
+    },
+    "categories": {
+      "title": "类别",
+      "subtitle": "您可以捐赠什么？",
+      "clothing": "衣物",
+      "furniture": "家具",
+      "books": "书籍",
+      "electronics": "电子产品",
+      "baby": "婴儿用品",
+      "others": "其他"
+    },
+    "steps": {
+      "title": "运作流程",
+      "subtitle": "四个简单步骤",
+      "createAccount": {
+        "title": "创建账户",
+        "desc": "通过创建简单的个人资料加入我们的社区。"
+      },
+      "listBrowse": {
+        "title": "发布或浏览物品",
+        "desc": "发布您想捐赠的物品或寻找您需要的东西。"
+      },
+      "connectSchedule": {
+        "title": "沟通与预约",
+        "desc": "直接发送消息并设置取货或送货时间。"
+      },
+      "makeImpact": {
+        "title": "创造影响",
+        "desc": "保护环境并帮助社区中的他人。"
+      }
+    }
+  },
+  "donate": {
+    "title": "捐赠物品",
+    "subtitle": "填写以下详细信息以发布您的捐赠物品。",
+    "fields": {
+      "title": "物品名称",
+      "category": "物品类别",
+      "description": "描述",
+      "photos": "照片",
+      "location": "取货位置"
+    },
+    "placeholders": {
+      "title": "例如：冬季夹克，近乎全新",
+      "category": "选择类别",
+      "description": "描述物品的新旧程度、尺寸及其他细节",
+      "upload": "点击上传照片",
+      "uploadInfo": "支持 PNG, JPG，最大 5MB",
+      "location": "输入您的地址或区域"
+    },
+    "categories": {
+      "clothing": "衣物",
+      "furniture": "家具",
+      "electronics": "电子产品",
+      "books": "书籍"
+    },
+    "selectedImages": "已选择",
+    "images": "张照片",
+    "submit": "提交捐赠"
+  },
+  "browse": {
+    "title": "浏览捐赠",
+    "subtitle": "寻找您所在地区可供捐赠的物品。"
+  },
+  "howItWorks": {
+    "subtitle": "运作流程",
+    "title": "四个简单步骤",
+    "steps": {
+      "step1": {
+        "title": "创建账户",
+        "desc": "创建简单的个人资料以加入社区。"
+      },
+      "step2": {
+        "title": "发布或浏览物品",
+        "desc": "发布闲置物品或寻找所需物品。"
+      },
+      "step3": { "title": "沟通与预约", "desc": "直接沟通并安排取货时间。" },
+      "step4": {
+        "title": "创造影响",
+        "desc": "减少浪费并帮助社区内有需要的人。"
+      }
+    }
+  },
+  "contact": {
+    "title": "联系与常见问题",
+    "subtitle": "有问题吗？我们随时为您提供帮助。",
+    "getInTouch": "取得联系",
+    "form": {
+      "name": "您的姓名",
+      "email": "您的电子邮箱",
+      "message": "您的留言",
+      "submit": "发送留言"
+    },
+    "faq": {
+      "title": "常见问题",
+      "q1": "我可以捐赠哪些物品？",
+      "a1": "您可以捐赠衣物、家具、书籍、电子产品、厨具、婴儿用品等。",
+      "q2": "取货是如何进行的？",
+      "a2": "与机构匹配后，您可以预约取货时间。",
+      "q3": "使用 GiveFlow 需要费用吗？",
+      "a3": "不！它是完全免费的。",
+      "q4": "机构是如何验证的？",
+      "a4": "所有机构都必须经过严格的验证流程。"
+    }
+  },
+  "footer": {
+    "description": "连接捐赠者与慈善机构及有需要的人。减少浪费，循环利用，建设社区。",
+    "platform": "平台",
+    "donateItems": "捐赠物品",
+    "browseDonations": "浏览捐赠",
+    "howItWorks": "运作流程",
+    "support": "支持",
+    "contactUs": "联系我们",
+    "faq": "常见问题",
+    "helpCenter": "帮助中心",
+    "legal": "法律信息",
+    "privacyPolicy": "隐私政策",
+    "termsOfService": "服务条款",
+    "cookiePolicy": "Cookie 政策",
+    "copyright": "© 2026 GiveFlow. 由 Hong Sophaline & Thoeun Mary 用心制作"
+  },
+  "notifications": {
+    "title": "通知",
+    "subtitle": "管理捐赠请求并获取最新动态。",
+    "unreadCount": "{{count}} 条未读",
+    "pendingTitle": "待处理请求",
+    "allTitle": "所有通知",
+    "markRead": "全部标记为已读",
+    "approve": "批准",
+    "reject": "拒绝",
+    "requested": "请求获取您的 \"{{item}}\""
+  },
+  "profile": {
+    "title": "个人资料",
+    "subtitle": "管理您的账户信息",
+    "editBtn": "编辑资料",
+    "memberSince": "注册时间",
+    "logoutPrompt": "想要切换账号？",
+    "logoutLink": "退出登录",
+    "stats": {
+      "donations": "捐赠次数",
+      "location": "地点",
+      "joined": "加入时间"
+    },
+    "labels": {
+      "fullName": "姓名",
+      "email": "电子邮箱",
+      "phone": "电话",
+      "location": "位置",
+      "bio": "个人简介"
+    }
+  },
+  "signup": {
+    "title": "创建账户",
+    "individual": "个人",
+    "organization": "机构",
+    "fullName": "姓名",
+    "phone": "电话号码",
+    "dob": "出生日期",
+    "orgEmail": "机构邮箱",
+    "password": "密码",
+    "button": "注册",
+    "alreadyHaveAccount": "已有账户？",
+    "loginLink": "登录",
+    "errors": {
+      "dobRequired": "请选择出生日期。",
+      "underage": "您必须年满 18 岁才能注册。",
+      "orgEmailRequired": "机构邮箱是必填项。"
+    }
+  },
+  "login": {
+    "title": "登录",
+    "phoneLabel": "电话号码",
+    "passwordLabel": "密码",
+    "button": "登录",
+    "loading": "正在检查...",
+    "noAccount": "还没有账号？",
+    "signupLink": "立即注册",
+    "createAccountBtn": "创建新账号",
+    "sendOtp": "发送验证码"
+  },
+  "editProfile": {
+    "backToProfile": "返回个人资料",
+    "title": "编辑个人资料",
+    "subtitle": "更新您的个人信息和公开展示的内容。",
+    "profilePicture": "个人头像",
+    "photoSpecs": "JPG, PNG 或 GIF • 最大 2MB",
+    "fullName": "姓名",
+    "phoneNumber": "电话号码",
+    "location": "位置 / 城市",
+    "bio": "个人简介",
+    "bioPlaceholder": "简单介绍一下你自己...",
+    "saveChanges": "保存更改",
+    "cancel": "取消",
+    "success": "个人资料更新成功！"
+  }
+}

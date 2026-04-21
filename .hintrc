@@ -1,0 +1,23 @@
+{
+  "extends": [
+    "development"
+  ],
+  "hints": {
+    "axe/forms": [
+      "default",
+      {
+        "label": "off",
+        "select-name": "off"
+<<<<<<< HEAD
+      }
+    ],
+    "axe/name-role-value": [
+      "default",
+      {
+        "button-name": "off"
+=======
+>>>>>>> a3d869183e475117c273b2f3004877bb96e4adf6
+      }
+    ]
+  }
+}

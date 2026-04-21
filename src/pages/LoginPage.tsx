@@ -1,55 +1,89 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import Cookies from "js-cookie"; // <-- import js-cookie
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState<string>("hong.sophaline@institute.com");
-  const [password, setPassword] = useState<string>("supersecretpassword");
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const { t } = useTranslation();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [phone, setPhone] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Logging in with:", { email, password });
-    // TODO: Connect your authentication logic here
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        "https://material-donation-backend-8.onrender.com/api/v1/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, password }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Invalid credentials");
+      }
+
+      // ✅ Store token in cookies instead of localStorage
+      if (data.token) {
+        Cookies.set("token", data.token, {
+          expires: 7, // 7 days expiration
+          secure: true, // send only over HTTPS
+          sameSite: "Strict", // CSRF protection
+        });
+      }
+
+      // Redirect to home
+      navigate("/");
+    } catch (err: any) {
+      setError(err.message || "Something went wrong.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center py-12 px-4">
       <div className="w-full max-w-xl flex flex-col items-center">
-        {/* Title */}
         <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-12">
-          Sign in
+          {t("login.title")}
         </h1>
 
         <form onSubmit={handleSubmit} className="w-full space-y-6">
-          {/* Email Field */}
           <div className="flex flex-col space-y-1.5">
             <label className="text-xs text-gray-500 font-medium">
-              Your Email
+              {t("login.phoneLabel")}
             </label>
             <input
-              type="email"
-              value={email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setEmail(e.target.value)
-              }
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+855 123 456 789"
               className="w-full p-3.5 bg-gray-100 text-gray-800 text-sm rounded-md focus:outline-none focus:bg-white focus:ring-1 focus:ring-gray-300 transition-all"
               required
             />
           </div>
 
-          {/* Password Field */}
           <div className="flex flex-col space-y-1.5">
             <label className="text-xs text-gray-500 font-medium">
-              Password
+              {t("signup.password")}
             </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setPassword(e.target.value)
-                }
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-3.5 bg-gray-100 text-gray-800 text-sm rounded-md pr-12 focus:outline-none focus:bg-white focus:ring-1 focus:ring-gray-300 transition-all"
                 required
               />
@@ -63,33 +97,26 @@ const LoginPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Login Button */}
+          {error && <p className="text-red-500 text-xs font-medium">{error}</p>}
+
           <button
             type="submit"
-            className="w-full mt-4 py-3 bg-pink-500 hover:bg-pink-600 text-white font-semibold text-sm rounded-md shadow-sm transition-colors"
+            disabled={isLoading}
+            className={`w-full mt-4 py-3 ${
+              isLoading ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
+            } text-white font-semibold text-sm rounded-md shadow-sm transition-colors`}
           >
-            Login
+            {isLoading ? "Checking..." : t("login.button") || "Login"}
           </button>
         </form>
 
-        {/* Account help links */}
         <div className="mt-4 text-xs text-gray-600">
-          Don't have an account?{" "}
+          {t("login.noAccount")}{" "}
           <Link
             to="/signup"
             className="text-blue-500 underline hover:text-blue-600"
           >
-            Sign up
-          </Link>
-        </div>
-
-        {/* CTA Button to Register */}
-        <div className="mt-16">
-          <Link
-            to="/signup"
-            className="inline-block px-10 py-3 bg-orange-700 hover:bg-orange-800 text-white text-sm font-semibold rounded-md shadow-sm transition-colors"
-          >
-            Create an account
+            {t("login.signupLink")}
           </Link>
         </div>
       </div>

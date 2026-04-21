@@ -8,6 +8,9 @@ import Donate from "./pages/Donate";
 import Browse from "./pages/Browse";
 import HowItWorks from "./pages/HowItWorks";
 import Contact from "./pages/Contact";
+import ProfilePage from "./pages/Profile";
+import NotificationsPage from "./pages/Notifications";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   return (
@@ -21,6 +24,9 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/notifications" element={<NotificationsPage userId={""} />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
       </Routes>
       <Footer />
     </BrowserRouter>

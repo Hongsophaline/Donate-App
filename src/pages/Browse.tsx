@@ -1,200 +1,117 @@
 "use client";
 
-import React, { useState } from "react";
-import { Search, MapPin, Clock, ChevronDown } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import SearchBar from '../components/SearchBar';
+import CategoryFilter from '../components/CategoryFilter';
+import DonationGrid from '../components/DonationGrid';
+import { Loader2 } from "lucide-react";
 
-interface DonationItem {
-  id: number;
-  title: string;
-  location: string;
-  time: string;
-  category: string;
-  condition: string;
-  image: string;
-}
+// Use your env variable or default to localhost
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-// Mock data
-const DUMMY_ITEMS: DonationItem[] = [
-  {
-    id: 1,
-    title: "Winter Jacket - Size M",
-    location: "Phnom Penh",
-    time: "2 hours ago",
-    category: "Clothing",
-    condition: "Like New",
-    image:
-      "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=400&q=80",
-  },
-  {
-    id: 2,
-    title: "Wooden Bookshelf",
-    location: "Siem Reap",
-    time: "5 hours ago",
-    category: "Furniture",
-    condition: "Good",
-    image:
-      "https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=400&q=80",
-  },
-  {
-    id: 3,
-    title: "Children's Books (Set of 12)",
-    location: "Phnom Penh",
-    time: "1 hour ago",
-    category: "Books",
-    condition: "Good",
-    image:
-      "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80",
-  },
-  {
-    id: 4,
-    title: "Winter Jacket - Size M",
-    location: "Phnom Penh",
-    time: "2 hours ago",
-    category: "Clothing",
-    condition: "Like New",
-    image:
-      "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=400&q=80",
-  },
-  {
-    id: 5,
-    title: "Wooden Bookshelf",
-    location: "Siem Reap",
-    time: "5 hours ago",
-    category: "Furniture",
-    condition: "Good",
-    image:
-      "https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=400&q=80",
-  },
-  {
-    id: 6,
-    title: "Children's Books (Set of 12)",
-    location: "Phnom Penh",
-    time: "1 hour ago",
-    category: "Books",
-    condition: "Good",
-    image:
-      "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80",
-  },
-];
+const Browse: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Store the ID for the API and the Name for the UI
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("All"); 
+  
+  const [donations, setDonations] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default function BrowseDonations() {
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  // 1. Fetch Categories once on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/api/categories`);
+        if (!res.ok) throw new Error("Failed to fetch categories");
+        const data = await res.json();
+        setCategories(Array.isArray(data) ? data : data.content || []);
+      } catch (err: any) {
+        console.error("Category Load Error:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
-  // Filter logic
-  const filteredItems = DUMMY_ITEMS.filter((item) => {
-    const matchesSearch = item.title
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || item.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  // 2. Fetch Donations whenever the selectedCategoryId changes
+  useEffect(() => {
+    const fetchDonations = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // Build the URL. If "All", fetch all. If ID exists, append query param.
+        let url = `${BASE_URL}/api/v1/donations`;
+        if (selectedCategoryId !== "All") {
+          url += `?categoryId=${selectedCategoryId}`;
+        }
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Error ${res.status}: Failed to fetch items`);
+        
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : data.content || [];
+
+        // Map backend response to your frontend DonationItem interface
+        const mappedItems = items.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          location: item.address || "No Location",
+          timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "Recently",
+          category: item.category?.name || "General",
+          imageUrl: item.imageUrls?.[0] || "https://via.placeholder.com/400x300?text=No+Image"
+        }));
+
+        setDonations(mappedItems);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDonations();
+  }, [selectedCategoryId]); // Triggered when category changes
+
+  // 3. Local filtering for the Search Bar
+  const filteredDonations = donations.filter(item => 
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <main className="flex-grow max-w-7xl mx-auto w-full px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">
-            Browse Donations
-          </h1>
-          <p className="text-gray-500 text-sm">
-            Find items available for donation in your area.
-          </p>
+    <div className="max-w-7xl mx-auto px-6 py-12">
+      <header className="text-center mb-12">
+        <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tight mb-2">
+          Browse Donations
+        </h1>
+        <p className="text-gray-500">Find items available for donation in your area.</p>
+      </header>
+
+      <div className="flex flex-col md:flex-row gap-4 mb-10">
+        <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        
+        {/* Pass ID to the filter so it can trigger the fetch */}
+        <CategoryFilter 
+          categories={categories} 
+          selected={selectedCategoryId} 
+          onSelect={(id) => setSelectedCategoryId(id)} 
+        />
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-20">
+          <Loader2 className="animate-spin text-green-600" size={40} />
         </div>
-
-        {/* Search & Filters */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 max-w-3xl mx-auto">
-          <div className="relative w-full sm:w-2/3">
-            <Search className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search items..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            />
-          </div>
-
-          <div className="relative w-full sm:w-1/3">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full pl-4 pr-10 py-2.5 border border-gray-300 rounded-md bg-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            >
-              <option value="All">All Categories</option>
-              <option value="Clothing">Clothing</option>
-              <option value="Furniture">Furniture</option>
-              <option value="Books">Books</option>
-            </select>
-            <ChevronDown className="absolute right-3 top-3.5 h-4 w-4 text-gray-400 pointer-events-none" />
-          </div>
-        </div>
-
-        {/* Grid */}
-        {filteredItems.length === 0 ? (
-          <p className="text-center text-gray-500">No items found.</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full"
-              >
-                {/* Image */}
-                <div className="h-56 w-full bg-gray-100 relative">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="p-5 flex flex-col flex-grow">
-                  <h3 className="text-md font-semibold text-gray-900 mb-2">
-                    {item.title}
-                  </h3>
-
-                  <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {item.location}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5" />
-                      {item.time}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                      {item.category}
-                    </span>
-                    <span
-                      className={`px-3 py-1 text-xs rounded-full ${
-                        item.condition === "Like New"
-                          ? "bg-orange-100 text-orange-800"
-                          : "bg-amber-100 text-amber-800"
-                      }`}
-                    >
-                      {item.condition}
-                    </span>
-                  </div>
-
-                  {/* Request Button */}
-                  <div className="mt-auto">
-                    <button className="w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium rounded-md transition-colors">
-                      Request Item
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
+      ) : error ? (
+        <div className="text-center py-20 text-red-500">{error}</div>
+      ) : filteredDonations.length === 0 ? (
+        <div className="text-center py-20 text-gray-500">No items found in this category.</div>
+      ) : (
+        <DonationGrid items={filteredDonations} />
+      )}
     </div>
   );
-}
+};
+
+export default Browse;
