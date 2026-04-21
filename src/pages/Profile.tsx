@@ -30,19 +30,17 @@ const ProfilePage = () => {
         const token = Cookies.get("token");
         if (!token) throw new Error("No auth token found.");
 
-        const res = await fetch(
-          "https://material-donation-backend-8.onrender.com/api/v1/auth/profile",
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
+        const res = await fetch("http://localhost:8080/api/v1/auth/profile", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         if (!res.ok) throw new Error("Failed to fetch profile data");
 
         const data = await res.json();
+
         setUserData({
           fullName: data.fullName || "",
           email: data.email,
@@ -59,6 +57,7 @@ const ProfilePage = () => {
         setLoading(false);
       }
     };
+
     fetchProfile();
   }, [navigate]);
 
@@ -73,6 +72,7 @@ const ProfilePage = () => {
         Loading...
       </div>
     );
+
   if (!userData) return null;
 
   const joinedDate = new Date(userData.createdAt).toLocaleString("en-US", {
@@ -132,6 +132,7 @@ const ProfilePage = () => {
                   value={userData.phone}
                 />
               </div>
+
               <ProfileField
                 label={t("profile.labels.email")}
                 value={userData.email || "—"}
