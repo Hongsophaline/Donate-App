@@ -19,7 +19,7 @@ const DonationCard = ({ item, onOpenRequest }: { item: any; onOpenRequest: (id: 
   };
 
   return (
-    <div className="bg-[#E9E9E9] rounded-2xl shadow-sm overflow-hidden flex flex-col p-3 border border-gray-200 w-full max-w-sm mx-auto">
+    <div className="bg-gray-100 rounded-2xl shadow-sm overflow-hidden flex flex-col p-3 border border-gray-200 w-full max-w-sm mx-auto">
       {/* Image Container */}
       <div className="h-56 w-full rounded-xl overflow-hidden mb-4 bg-white">
         <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
@@ -57,7 +57,14 @@ const DonationCard = ({ item, onOpenRequest }: { item: any; onOpenRequest: (id: 
         >
           Request Item
         </button>
+          <button 
+  onClick={() => onOpenRequest(item.id)} // This now triggers the Detail Modal in Browse.tsx
+  className="text-orange-500 bg-orange-50 px-1 py-3 rounded text-xs font-semibold hover:bg-orange-100 transition-colors"
+>
+  View Details
+</button>
       </div>
+    
     </div>
   );
 };
