@@ -26,7 +26,7 @@ const EditProfile: React.FC = () => {
         const token = Cookies.get("token");
         if (!token) return;
         const res = await fetch(
-          "https://material-donation-backend-4.onrender.com/api/v1/auth/profile",
+          "https://material-donation-backend-8.onrender.com/api/v1/auth/profile",
           { headers: { Authorization: `Bearer ${token}` } },
         );
         if (!res.ok) throw new Error("Failed to fetch profile");
@@ -58,7 +58,7 @@ const EditProfile: React.FC = () => {
       if (!token) throw new Error("No token found");
 
       const res = await fetch(
-        "https://material-donation-backend-4.onrender.com/api/v1/auth/profile",
+        "https://material-donation-backend-8.onrender.com/api/v1/auth/profile",
         {
           method: "PUT",
           headers: {

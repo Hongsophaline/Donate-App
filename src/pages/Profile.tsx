@@ -31,7 +31,7 @@ const ProfilePage = () => {
         if (!token) throw new Error("No auth token found.");
 
         const res = await fetch(
-          "https://material-donation-backend-4.onrender.com/api/v1/auth/profile",
+          "https://material-donation-backend-8.onrender.com/api/v1/auth/profile",
           {
             headers: {
               "Content-Type": "application/json",

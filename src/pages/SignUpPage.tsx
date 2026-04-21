@@ -97,14 +97,14 @@ const SignUpPage: React.FC = () => {
 
     console.log("--- Request Started ---");
     console.log(
-      "Target URL: https://material-donation-backend-4.onrender.com/api/v1/auth/register",
+      "Target URL: https://material-donation-backend-8.onrender.com/api/v1/auth/register",
     );
     console.log("Payload being sent:", payload);
 
     // 3. Fetch API
     try {
       const response = await fetch(
-        "https://material-donation-backend-4.onrender.com/api/v1/auth/register",
+        "https://material-donation-backend-8.onrender.com/api/v1/auth/register",
         {
           method: "POST",
           headers: {
