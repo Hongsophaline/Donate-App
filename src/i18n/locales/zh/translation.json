@@ -111,7 +111,10 @@
         "title": "发布或浏览物品",
         "desc": "发布闲置物品或寻找所需物品。"
       },
-      "step3": { "title": "沟通与预约", "desc": "直接沟通并安排取货时间。" },
+      "step3": {
+        "title": "沟通与预约",
+        "desc": "直接沟通并安排取货时间。"
+      },
       "step4": {
         "title": "创造影响",
         "desc": "减少浪费并帮助社区内有需要的人。"
@@ -154,18 +157,28 @@
     "privacyPolicy": "隐私政策",
     "termsOfService": "服务条款",
     "cookiePolicy": "Cookie 政策",
-    "copyright": "© 2026 GiveFlow. 由 Hong Sophaline & Thoeun Mary 用心制作"
+    "copyright": "© 2026 KindDrop. 由 Hong Sophaline & Thoeun Mary 用心制作"
   },
   "notifications": {
     "title": "通知",
-    "subtitle": "管理捐赠请求并获取最新动态。",
-    "unreadCount": "{{count}} 条未读",
+    "subtitle": "管理捐赠请求并获取最新信息。",
+    "unreadCount": "{{count}} 未读",
     "pendingTitle": "待处理请求",
     "allTitle": "所有通知",
-    "markRead": "全部标记为已读",
-    "approve": "批准",
+    "markRead": "全部标记已读",
+    "approve": "通过",
     "reject": "拒绝",
-    "requested": "请求获取您的 \"{{item}}\""
+    "requested": "请求了您的 \"{{item}}\"",
+    "approved": "已批准您的请求",
+    "rejected": "已拒绝您的请求",
+    "systemUpdate": "系统更新",
+    "donationApproved": "捐赠已批准",
+    "newRequest": "新请求",
+    "noNotifications": "暂无通知",
+    "noPending": "暂无待处理请求",
+    "loading": "正在加载通知...",
+    "error": "加载失败",
+    "timeAgo": "刚刚"
   },
   "profile": {
     "title": "个人资料",
