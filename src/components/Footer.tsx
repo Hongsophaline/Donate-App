@@ -71,17 +71,17 @@ const Footer = () => {
           <h3 className="font-bold text-lg mb-4">{t("footer.legal")}</h3>
           <ul className="flex flex-col gap-3 text-sm text-gray-200">
             <li>
-              <Link to="/contact" className="hover:underline">
+              <Link to="/How-It-Works" className="hover:underline">
                 {t("footer.privacyPolicy")}
               </Link>
             </li>
             <li>
-              <Link to="/contact" className="hover:underline">
+              <Link to="/How-It-Works" className="hover:underline">
                 {t("footer.termsOfService")}
               </Link>
             </li>
             <li>
-              <Link to="/contact" className="hover:underline">
+              <Link to="/How-It-Works" className="hover:underline">
                 {t("footer.cookiePolicy")}
               </Link>
             </li>
