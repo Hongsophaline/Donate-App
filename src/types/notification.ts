@@ -1,7 +1,11 @@
+export type NotificationStatus = "pending" | "approved" | "rejected" | "info";
+
 export interface Notification {
   id: string;
+  title: string;
   message: string;
-  senderId: string;
+  type: "INFO" | "REQUEST";
+  status: NotificationStatus;
   createdAt: string;
-  type?: "request" | "approval" | "rejection" | string;
+  targetUserId?: string;
 }

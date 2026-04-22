@@ -1,34 +1,27 @@
-import type { Notification } from "../types/notification";
-
-const BASE_URL = "https://material-donation-backend-4.onrender.com/api/v1/notifications";
-
-export const fetchNotifications = async (userId: string, token: string): Promise<Notification[]> => {
-  const res = await fetch(`${BASE_URL}/user/${userId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error(`Server error: ${res.status}`);
-  const data = await res.json();
-  return Array.isArray(data) ? data : [];
-};
+const BASE_URL = "http://localhost:8080";
 
 export const sendNotificationAction = async (
   targetUserId: string,
   actionType: "approved" | "rejected",
-  senderId: string,
-  token: string
+  userId: string,
+  token: string,
 ) => {
-  const res = await fetch(`${BASE_URL}/send/${targetUserId}`, {
-    method: "POST",
+  const res = await fetch(`${BASE_URL}/api/v1/notifications/action`, {
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      message: `Update: Your request has been ${actionType}.`,
-      type: actionType,
-      senderId,
+      targetUserId,
+      actionType,
+      userId,
     }),
   });
-  if (!res.ok) throw new Error(`Failed to ${actionType} request.`);
+
+  if (!res.ok) {
+    throw new Error("Failed to update notification");
+  }
+
   return res.json();
 };

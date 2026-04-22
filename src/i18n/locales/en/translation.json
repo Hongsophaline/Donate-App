@@ -168,70 +168,16 @@
     "markRead": "Mark all read",
     "approve": "Approve",
     "reject": "Reject",
-    "requested": "requested your \"{{item}}\""
-  },
-  "profile": {
-    "title": "My Profile",
-    "subtitle": "Manage your account information",
-    "editBtn": "Edit Profile",
-    "memberSince": "Member since",
-    "logoutPrompt": "Want to switch accounts?",
-    "logoutLink": "Log out",
-    "stats": {
-      "donations": "Donations",
-      "location": "Location",
-      "joined": "Joined"
-    },
-    "labels": {
-      "fullName": "Full Name",
-      "email": "Email",
-      "phone": "Phone",
-      "location": "Location",
-      "bio": "Bio"
-    }
-  },
-  "signup": {
-    "title": "Create an account",
-    "individual": "Individual",
-    "organization": "Organization",
-    "fullName": "Full Name",
-    "phone": "Phone Number",
-    "dob": "Date of Birth",
-    "orgEmail": "Organization Email",
-    "password": "Password",
-    "button": "Sign Up",
-    "alreadyHaveAccount": "Already have an account?",
-    "loginLink": "Log in",
-    "errors": {
-      "dobRequired": "Please select your date of birth.",
-      "underage": "You must be at least 18 years old to register.",
-      "orgEmailRequired": "Organization email is required."
-    }
-  },
-  "login": {
-    "title": "Sign in",
-    "phoneLabel": "Phone Number",
-    "passwordLabel": "Password",
-    "button": "Login",
-    "loading": "Checking...",
-    "noAccount": "Don't have an account?",
-    "signupLink": "Sign up",
-    "createAccountBtn": "Create an account",
-    "sendOtp": "Send OTP"
-  },
-  "editProfile": {
-    "backToProfile": "Back to Profile",
-    "title": "Edit Profile",
-    "subtitle": "Update your personal information and how others see you.",
-    "profilePicture": "Profile Picture",
-    "photoSpecs": "JPG, PNG or GIF • Max 2MB",
-    "fullName": "Full Name",
-    "phoneNumber": "Phone Number",
-    "location": "Location / City",
-    "bio": "Short Bio",
-    "bioPlaceholder": "Tell us a bit about yourself...",
-    "saveChanges": "Save Changes",
-    "cancel": "Cancel",
-    "success": "Profile updated successfully!"
+    "requested": "requested your \"{{item}}\"",
+    "approved": "approved your request",
+    "rejected": "rejected your request",
+    "systemUpdate": "System Update",
+    "donationApproved": "Donation Approved",
+    "newRequest": "New Donation Request",
+    "noNotifications": "No notifications yet",
+    "noPending": "No pending requests",
+    "loading": "Loading notifications...",
+    "error": "Failed to load notifications",
+    "timeAgo": "Just now"
   }
 }
