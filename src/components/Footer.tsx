@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next"; // 1. Import hook
+import { useTranslation } from "react-i18next";
 import logoImg from "../assets/logo-removebg-preview.png";
 
 const Footer = () => {
-  const { t } = useTranslation(); // 2. Initialize translation
+  const { t } = useTranslation();
 
   return (
     <footer className="bg-[#B33D11] text-white pt-12 pb-6 px-10">
@@ -44,7 +44,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Column 3: Support */}
+        {/* Column 3: Support (all go to /contact) */}
         <div>
           <h3 className="font-bold text-lg mb-4">{t("footer.support")}</h3>
           <ul className="flex flex-col gap-3 text-sm text-gray-200">
@@ -54,34 +54,34 @@ const Footer = () => {
               </Link>
             </li>
             <li>
-              <Link to="/faq" className="hover:underline">
+              <Link to="/contact" className="hover:underline">
                 {t("footer.faq")}
               </Link>
             </li>
             <li>
-              <Link to="/help" className="hover:underline">
+              <Link to="/contact" className="hover:underline">
                 {t("footer.helpCenter")}
               </Link>
             </li>
           </ul>
         </div>
 
-        {/* Column 4: Legal */}
+        {/* Column 4: Legal (all go to /contact) */}
         <div>
           <h3 className="font-bold text-lg mb-4">{t("footer.legal")}</h3>
           <ul className="flex flex-col gap-3 text-sm text-gray-200">
             <li>
-              <Link to="/privacy" className="hover:underline">
+              <Link to="/contact" className="hover:underline">
                 {t("footer.privacyPolicy")}
               </Link>
             </li>
             <li>
-              <Link to="/terms" className="hover:underline">
+              <Link to="/contact" className="hover:underline">
                 {t("footer.termsOfService")}
               </Link>
             </li>
             <li>
-              <Link to="/cookie" className="hover:underline">
+              <Link to="/contact" className="hover:underline">
                 {t("footer.cookiePolicy")}
               </Link>
             </li>
@@ -89,7 +89,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom Copyright Section */}
+      {/* Bottom Copyright */}
       <div className="mt-12 pt-6 border-t border-white/20 text-center text-sm text-gray-200">
         <p>{t("footer.copyright")}</p>
       </div>
