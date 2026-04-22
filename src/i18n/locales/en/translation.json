@@ -3,7 +3,7 @@
     "home": "Home",
     "donate": "Donate",
     "browse": "Browse",
-    "howItWorks": "How it works",
+    "howItWorks": "How It Works",
     "contact": "Contact",
     "login": "Login",
     "signUp": "Sign Up",
@@ -17,7 +17,7 @@
       "titlePart2": "Change a Life",
       "desc": "Donate clothes, furniture, books, and more to local charities and individuals in need. Help us reduce waste and build a stronger community.",
       "getStarted": "Get Started →",
-      "howItWorks": "How it works",
+      "howItWorks": "How It Works",
       "alt": "Donation Boxes"
     },
     "features": {
@@ -47,7 +47,7 @@
       "others": "Others"
     },
     "steps": {
-      "title": "How it works",
+      "title": "How It Works",
       "subtitle": "Four Simple Steps",
       "createAccount": {
         "title": "Create an Account",
@@ -100,7 +100,7 @@
     "subtitle": "Find items available for donation in your area."
   },
   "howItWorks": {
-    "subtitle": "How it works",
+    "subtitle": "How It Works",
     "title": "Four Simple Steps",
     "steps": {
       "step1": {
@@ -137,7 +137,7 @@
       "a1": "You can donate clothes, furniture, books, electronics, kitchen items, baby goods, and more.",
       "q2": "How does pickup work?",
       "a2": "You can schedule a pickup after matching with an organization.",
-      "q3": "Is there a cost to use GiveFlow?",
+      "q3": "Is there a cost to use this platform?",
       "a3": "No! It is completely free.",
       "q4": "How are organizations verified?",
       "a4": "All organizations go through a verification process."
@@ -179,5 +179,71 @@
     "loading": "Loading notifications...",
     "error": "Failed to load notifications",
     "timeAgo": "Just now"
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your account information",
+    "editBtn": "Edit Profile",
+    "memberSince": "Member since",
+    "logoutPrompt": "Want to switch account?",
+    "logoutLink": "Logout",
+    "stats": {
+      "donations": "Donations",
+      "location": "Location",
+      "joined": "Joined"
+    },
+    "labels": {
+      "fullName": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location",
+      "bio": "Bio"
+    }
+  },
+  "signup": {
+    "title": "Create Account",
+    "individual": "Individual",
+    "organization": "Organization",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "dob": "Date of Birth",
+    "orgEmail": "Organization Email",
+    "password": "Password",
+    "button": "Sign Up",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginLink": "Login",
+    "createAccountBtn": "Create Account",
+    "sendOtp": "Send OTP",
+    "errors": {
+      "dobRequired": "Please select your date of birth.",
+      "underage": "You must be at least 18 years old to sign up.",
+      "orgEmailRequired": "Organization email is required."
+    }
+  },
+  "login": {
+    "title": "Login",
+    "phoneLabel": "Phone Number",
+    "passwordLabel": "Password",
+    "button": "Login",
+    "loading": "Checking...",
+    "noAccount": "Don't have an account?",
+    "signupLink": "Sign Up",
+    "createAccountBtn": "Create Account",
+    "sendOtp": "Send OTP"
+  },
+  "editProfile": {
+    "backToProfile": "Back to Profile",
+    "title": "Edit Profile",
+    "subtitle": "Update your personal information and photo.",
+    "profilePicture": "Profile Picture",
+    "photoSpecs": "JPG, PNG or GIF • Max 2MB",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "location": "Location / City",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell something about yourself...",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "success": "Profile updated successfully!"
   }
 }
