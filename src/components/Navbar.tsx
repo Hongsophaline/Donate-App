@@ -1,13 +1,30 @@
-import { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Menu, X, User, Bell } from "lucide-react";
+import { Menu, X, User, Bell, LogOut } from "lucide-react";
+import Cookies from "js-cookie";
 import logoImg from "../assets/logo.png";
 import LanguageSelector from "../components/common/LanguageSelector";
 
 const Navbar = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation(); // Used to trigger a re-check when navigating
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check if user is logged in based on cookie presence
+  useEffect(() => {
+    const token = Cookies.get("token");
+    setIsLoggedIn(!!token);
+  }, [location]); // Re-run check whenever the URL changes
+
+  const handleLogout = () => {
+    Cookies.remove("token");
+    setIsLoggedIn(false);
+    setIsOpen(false);
+    navigate("/login");
+  };
 
   const navClass = ({ isActive }: { isActive: boolean }) =>
     isActive
@@ -40,40 +57,50 @@ const Navbar = () => {
 
         {/* 3. Right Side Actions */}
         <div className="flex items-center gap-1 md:gap-3">
-          {/* Language Selector */}
           <div className="hidden sm:block">
             <LanguageSelector />
           </div>
 
-          {/* User Icons & Sign Up Button Group */}
           <div className="flex items-center gap-1 md:gap-2 ml-2 md:border-l md:pl-4 border-gray-200">
-            {/* CHANGED: Notification Icon is now a Link to /notifications */}
-            <Link
-              to="/notifications"
-              className="p-2 hover:bg-gray-100 rounded-full transition text-gray-700 relative"
-              title={t("notifications.title")}
-            >
-              <Bell size={22} />
-              {/* Notification Badge */}
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </Link>
+            {/* Show Bell and Profile ONLY if logged in */}
+            {isLoggedIn && (
+              <>
+                <Link
+                  to="/notifications"
+                  className="p-2 hover:bg-gray-100 rounded-full transition text-gray-700 relative"
+                  title={t("notifications.title")}
+                >
+                  <Bell size={22} />
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                </Link>
 
-            {/* Profile Icon */}
-            <Link
-              to="/profile"
-              className="p-2 hover:bg-gray-100 rounded-full transition text-gray-700"
-              title={t("profile.title")}
-            >
-              <User size={22} />
-            </Link>
+                <Link
+                  to="/profile"
+                  className="p-2 hover:bg-gray-100 rounded-full transition text-gray-700"
+                  title={t("profile.title")}
+                >
+                  <User size={22} />
+                </Link>
+              </>
+            )}
 
-            {/* Sign Up Button (Desktop) */}
-            <Link
-              to="/signup"
-              className="hidden md:block bg-green-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-green-700 transition shadow-sm ml-2"
-            >
-              {t("navbar.signUp")}
-            </Link>
+            {/* Switch between Sign Up and Logout */}
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="hidden md:flex items-center gap-2 bg-red-50 text-red-600 px-5 py-2.5 rounded-xl font-bold hover:bg-red-100 transition shadow-sm ml-2"
+              >
+                <LogOut size={18} />
+                {t("profile.logoutLink") || "Logout"}
+              </button>
+            ) : (
+              <Link
+                to="/signup"
+                className="hidden md:block bg-green-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-green-700 transition shadow-sm ml-2"
+              >
+                {t("navbar.signUp")}
+              </Link>
+            )}
           </div>
 
           {/* Mobile Hamburger Menu */}
@@ -106,25 +133,32 @@ const Navbar = () => {
             </NavLink>
           ))}
 
-          {/* Mobile-only Notifications link for better UX */}
-          <NavLink
-            to="/notifications"
-            className={navClass}
-            onClick={() => setIsOpen(false)}
-          >
-            {t("notifications.title")}
-          </NavLink>
-
-          <div className="h-[1px] bg-gray-100 my-2"></div>
-
-          {/* Mobile Sign Up Button */}
-          <Link
-            to="/signup"
-            className="w-full py-4 text-center bg-green-600 text-white rounded-xl font-bold shadow-md active:scale-95 transition-transform"
-            onClick={() => setIsOpen(false)}
-          >
-            {t("navbar.signUp")}
-          </Link>
+          {/* Mobile conditional links */}
+          {isLoggedIn ? (
+            <>
+              <NavLink
+                to="/profile"
+                className={navClass}
+                onClick={() => setIsOpen(false)}
+              >
+                {t("profile.title")}
+              </NavLink>
+              <button
+                onClick={handleLogout}
+                className="w-full py-4 text-center bg-red-50 text-red-600 rounded-xl font-bold active:scale-95 transition-transform"
+              >
+                {t("profile.logoutLink") || "Logout"}
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/signup"
+              className="w-full py-4 text-center bg-green-600 text-white rounded-xl font-bold shadow-md active:scale-95 transition-transform"
+              onClick={() => setIsOpen(false)}
+            >
+              {t("navbar.signUp")}
+            </Link>
+          )}
         </div>
       </div>
     </nav>
