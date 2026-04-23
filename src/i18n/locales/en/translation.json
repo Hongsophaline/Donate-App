@@ -10,6 +10,7 @@
     "notifications": "Notifications",
     "profile": "Profile"
   },
+
   "home": {
     "hero": {
       "tagline": "Connecting people with each other",
@@ -67,38 +68,51 @@
       }
     }
   },
+
   "donate": {
-    "title": "Donate Your Items",
+    "title": "List an Item",
     "subtitle": "Fill in the details below to list your items for donation.",
+
+    "uploadPhoto": "Click to upload photo",
+
     "fields": {
       "title": "Item Title",
-      "category": "Category Item",
-      "description": "Description",
-      "photos": "Photos",
-      "location": "Pickup Location"
+      "category": "Category",
+      "condition": "Condition",
+      "quantity": "Quantity",
+      "address": "Pickup Address",
+      "description": "Description"
     },
+
     "placeholders": {
       "title": "e.g., Winter jacket, like new",
       "category": "Select a Category",
       "description": "Describe the condition, size and any other detail",
-      "upload": "Click to upload photos",
-      "uploadInfo": "PNG, JPG up to 5MB",
-      "location": "Enter your address or area"
+      "address": "Enter your address or area"
     },
-    "categories": {
-      "clothing": "Clothing",
-      "furniture": "Furniture",
-      "electronics": "Electronics",
-      "books": "Books"
+
+    "status": {
+      "processing": "Processing...",
+      "success": "Donation successful! Redirecting...",
+      "errorCategory": "Please select a category",
+      "errorImage": "Please upload an image"
     },
-    "selectedImages": "Selected",
-    "images": "images",
+
+    "conditions": {
+      "new": "New",
+      "good": "Good",
+      "likeNew": "Like New",
+      "old": "Old"
+    },
+
     "submit": "Submit Donation"
   },
+
   "browse": {
     "title": "Browse Donations",
     "subtitle": "Find items available for donation in your area."
   },
+
   "howItWorks": {
     "subtitle": "How it works",
     "title": "Four Simple Steps",
@@ -121,6 +135,7 @@
       }
     }
   },
+
   "contact": {
     "title": "Contact & FAQ",
     "subtitle": "Have questions? We're here to help.",
@@ -143,6 +158,7 @@
       "a4": "All organizations go through a verification process."
     }
   },
+
   "footer": {
     "description": "Connecting donors with charities and individuals in need. Reduce waste, reuse items, build community.",
     "platform": "Platform",
@@ -159,6 +175,7 @@
     "cookiePolicy": "Cookie Policy",
     "copyright": "© 2026 GiveFlow. Made with ❤ by Hong Sophaline & Thoeun Mary"
   },
+
   "notifications": {
     "title": "Notifications",
     "subtitle": "Manage donation requests and stay updated.",
@@ -170,6 +187,7 @@
     "reject": "Reject",
     "requested": "requested your \"{{item}}\""
   },
+
   "profile": {
     "title": "My Profile",
     "subtitle": "Manage your account information",
@@ -190,6 +208,7 @@
       "bio": "Bio"
     }
   },
+
   "signup": {
     "title": "Create an account",
     "individual": "Individual",
@@ -208,6 +227,7 @@
       "orgEmailRequired": "Organization email is required."
     }
   },
+
   "login": {
     "title": "Sign in",
     "phoneLabel": "Phone Number",
@@ -219,6 +239,7 @@
     "createAccountBtn": "Create an account",
     "sendOtp": "Send OTP"
   },
+
   "editProfile": {
     "backToProfile": "Back to Profile",
     "title": "Edit Profile",
