@@ -1,217 +1,124 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
-import { Clock, Bell, CheckCircle2, Loader2, Check, X } from "lucide-react";
-// Import the api and auth we created in the previous step
-import { api, auth, type Notification } from "../lib/api"; 
+import { useEffect, useState, useMemo } from "react";
+import { Clock, Bell, Check, CheckCircle2, X } from "lucide-react";
+import Cookies from "js-cookie";
+import { getNotifications } from "./service/notificationService";
+
+type NotificationStatus = "pending" | "approved" | "rejected" | "info";
+
+interface Notification {
+  id: string;
+  user: string;
+  action: string;
+  item: string;
+  comment?: string;
+  time: string;
+  status: NotificationStatus;
+}
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const user = auth.getUser();
-  const userId = user?.id;
-
-  /* -------------------- API CALLS -------------------- */
-
-  const fetchNotifications = useCallback(async () => {
-    if (!userId) return;
-    try {
-      setLoading(true);
-      const data = await api.getNotifications(userId);
-      // Ensure data is an array
-      setNotifications(Array.isArray(data) ? data : []);
-      setError(null);
-    } catch (err: any) {
-      console.error("Error fetching notifications:", err);
-      setError("Failed to load notifications.");
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
 
   useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
+    const fetchData = async () => {
+      const token = Cookies.get("token");
+      const userId = Cookies.get("userId");
 
-  // 1. Mark Single Notification as Read
-  const handleMarkAsRead = async (id: string) => {
-    try {
-      await api.markNotificationRead(id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-      );
-    } catch (err) {
-      console.error("Error marking as read:", err);
-    }
-  };
+      if (!token || !userId) return;
 
-  // 2. Mark All as Read
-  const handleMarkAllRead = async () => {
-    if (!userId) return;
-    try {
-      await api.markAllNotificationsRead(userId);
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    } catch (err) {
-      console.error("Error marking all read:", err);
-    }
-  };
+      try {
+        const data = await getNotifications(userId);
+        setNotifications(data);
+      } catch (err) {
+        console.error("Notification fetch error:", err);
+      }
+    };
 
-  // 3. Handle Action (Approve/Reject)
-  // This sends a notification BACK to the person who requested
-  const handleRequestAction = async (notif: Notification, action: "approved" | "rejected") => {
-    if (!userId) return;
-    try {
-      // In a real app, you'd call api.approveRequest(id) here.
-      // But based on your request, we trigger a notification back:
-      await api.sendNotification(userId, {
-        role: "SYSTEM",
-        type: action.toUpperCase(),
-        title: `Donation ${action.toUpperCase()}`,
-        message: `Your request for "${notif.title}" has been ${action}.`
-      });
-      
-      // Mark the original notification as read/processed
-      await handleMarkAsRead(notif.id);
-      alert(`Request ${action} successfully!`);
-    } catch (err) {
-      alert("Failed to process action.");
-    }
-  };
+    fetchData();
+  }, []);
 
-  /* -------------------- COMPUTED -------------------- */
-  
   const pendingRequests = useMemo(
-    () => notifications.filter((n) => !n.read),
-    [notifications]
+    () => notifications.filter((n) => n.status === "pending"),
+    [notifications],
   );
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="w-8 h-8 animate-spin text-[#10B981]" />
-          <p className="text-sm text-gray-500">Loading notifications...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] py-10 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-[#1F2937] mb-1">Notifications</h1>
-          <div className="flex items-center justify-center gap-2">
-            <p className="text-gray-500 text-sm font-medium">Manage donation requests.</p>
-            {pendingRequests.length > 0 && (
-              <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
-                {pendingRequests.length} New
-              </span>
-            )}
-          </div>
+          <h1 className="text-3xl font-bold">Notifications</h1>
+          <p className="text-gray-500 text-sm">
+            Manage donation requests and updates
+          </p>
         </div>
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm text-center">
-            {error}
-          </div>
-        )}
-
-        {/* Pending Requests Section */}
+        {/* Pending */}
         <section className="mb-10">
           <div className="flex items-center gap-2 mb-4">
-            <Clock className="text-[#EAB308] w-5 h-5" />
-            <h2 className="text-lg font-bold text-gray-800">Pending Actions</h2>
+            <Clock className="text-yellow-500" />
+            <h2 className="font-bold">Pending Requests</h2>
+            <span className="bg-yellow-100 text-yellow-600 px-2 text-xs rounded">
+              {pendingRequests.length}
+            </span>
           </div>
 
           <div className="space-y-4">
-            {pendingRequests.length === 0 ? (
-              <div className="bg-white border border-dashed border-gray-200 rounded-3xl p-8 text-center">
-                <p className="text-sm text-gray-400">No new requests to show.</p>
-              </div>
-            ) : (
-              pendingRequests.map((notif) => (
-                <div key={notif.id} className="bg-[#FFF9EE] border border-[#FDE68A]/30 rounded-3xl p-5 shadow-sm">
-                  <div className="flex gap-4">
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-900 font-bold">{notif.title || "Donation Request"}</p>
-                      <p className="text-xs text-gray-600 mt-1">{notif.message}</p>
-                      <p className="text-[10px] text-gray-400 mt-2">
-                        {notif.createdAt ? new Date(notif.createdAt).toLocaleString() : "Just now"}
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <button 
-                        onClick={() => handleRequestAction(notif, "approved")}
-                        className="bg-[#10B981] hover:bg-[#059669] text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1"
-                      >
-                        <Check className="w-3 h-3" /> Approve
-                      </button>
-                      <button 
-                         onClick={() => handleRequestAction(notif, "rejected")}
-                        className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1"
-                      >
-                        <X className="w-3 h-3" /> Decline
-                      </button>
-                    </div>
-                  </div>
+            {pendingRequests.map((n) => (
+              <div key={n.id} className="p-4 bg-yellow-50 rounded-xl">
+                <p>
+                  <b>{n.user}</b> {n.action} <b>{n.item}</b>
+                </p>
+
+                {n.comment && (
+                  <p className="text-sm text-gray-500">{n.comment}</p>
+                )}
+
+                <p className="text-xs text-gray-400">{n.time}</p>
+
+                <div className="flex gap-2 mt-2">
+                  <button className="bg-green-500 text-white px-3 py-1 rounded">
+                    Approve
+                  </button>
+                  <button className="bg-red-500 text-white px-3 py-1 rounded">
+                    Reject
+                  </button>
                 </div>
-              ))
-            )}
+              </div>
+            ))}
           </div>
         </section>
 
-        {/* All Notifications Section */}
+        {/* All */}
         <section>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Bell className="text-[#10B981] w-5 h-5" />
-              <h2 className="text-lg font-bold text-gray-800">History</h2>
+              <Bell />
+              <h2 className="font-bold">All Notifications</h2>
             </div>
-            {notifications.some(n => !n.read) && (
-              <button 
-                onClick={handleMarkAllRead}
-                className="text-[#10B981] text-xs font-bold flex items-center gap-1 hover:underline transition-all"
-              >
-                <CheckCircle2 className="w-3 h-3" /> Mark all read
-              </button>
-            )}
           </div>
 
           <div className="space-y-2">
-            {notifications.length === 0 && !loading && (
-              <p className="text-center text-gray-400 text-sm py-10">Notification history is empty.</p>
-            )}
-            {notifications.map((notif) => (
+            {notifications.map((n) => (
               <div
-                key={notif.id}
-                className={`border rounded-2xl p-4 flex items-center justify-between transition-all ${
-                  notif.read ? "bg-white border-gray-100 opacity-70" : "bg-white border-[#10B981]/20 shadow-sm"
-                }`}
+                key={n.id}
+                className="p-3 bg-green-50 flex justify-between rounded"
               >
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${notif.read ? "bg-gray-50" : "bg-[#F0FDF4]"}`}>
-                    <Bell className={`w-5 h-5 ${notif.read ? "text-gray-300" : "text-[#10B981]"}`} />
-                  </div>
-                  <div>
-                    <p className={`text-sm ${notif.read ? "text-gray-500" : "text-gray-800 font-semibold"}`}>
-                      {notif.message}
-                    </p>
-                    <p className="text-[10px] text-gray-400 uppercase mt-0.5 tracking-wider">
-                       {notif.createdAt ? new Date(notif.createdAt).toLocaleDateString() : ""}
-                    </p>
-                  </div>
+                <div>
+                  <p className="text-sm">
+                    <b>{n.user}</b> {n.action} <b>{n.item}</b>
+                  </p>
+                  <p className="text-xs text-gray-400">{n.time}</p>
                 </div>
-                {!notif.read && (
-                   <button 
-                    onClick={() => handleMarkAsRead(notif.id)}
-                    className="w-2.5 h-2.5 bg-[#10B981] rounded-full"
-                    title="Mark as read"
-                   />
-                )}
+
+                <div>
+                  {n.status === "approved" ? (
+                    <Check className="text-green-500" />
+                  ) : (
+                    <Clock className="text-orange-400" />
+                  )}
+                </div>
               </div>
             ))}
           </div>
