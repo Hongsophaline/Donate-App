@@ -5,7 +5,9 @@ import React from "react";
 /* =========================
    TYPES
 ========================= */
-
+/* =========================
+   TYPES
+========================= */
 export interface Category {
   id: string;
   name: string;
