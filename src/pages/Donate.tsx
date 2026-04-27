@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import { MapPin, Loader2, CheckCircle2, AlertCircle, Camera, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-// Cloudinary Configuration
+// Environment Configuration
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dml6kygxk/image/upload";
 const UPLOAD_PRESET = "Mary_default";
 
@@ -46,15 +47,14 @@ export default function Donate() {
     return token ? { "Authorization": `Bearer ${token}` } : {};
   };
 
-  // FIXED: Safer Fetch logic
+  // Fetch categories using the local/env BASE_URL
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("https://material-donation-backend-8.onrender.com/api/categories", {
+        const res = await fetch(`${BASE_URL}/api/categories`, {
           headers: getAuthHeader() as any,
         });
 
-        // This prevents the "Unexpected end of JSON input" error
         if (!res.ok) {
           console.error(`Failed to fetch categories: ${res.status}`);
           return;
@@ -79,9 +79,11 @@ export default function Donate() {
     setStatus(null);
 
     try {
+      // 1. Upload to Cloudinary
       const imageUrl = await uploadImageToCloudinary(imageFile);
 
-      const res = await fetch("https://material-donation-backend-8.onrender.com/api/v1/donations", {
+      // 2. Submit Donation Data
+      const res = await fetch(`${BASE_URL}/api/v1/donations`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -96,9 +98,10 @@ export default function Donate() {
       if (!res.ok) throw new Error("Failed to create donation");
       const donation = await res.json();
 
+      // 3. Link Image to Donation
       if (imageUrl && donation.id) {
         await fetch(
-          `https://material-donation-backend-8.onrender.com/api/v1/donations/${donation.id}/images?imageUrl=${encodeURIComponent(imageUrl)}`,
+          `${BASE_URL}/api/v1/donations/${donation.id}/images?imageUrl=${encodeURIComponent(imageUrl)}`,
           {
             method: "POST",
             headers: getAuthHeader() as any,
@@ -117,8 +120,10 @@ export default function Donate() {
   return (
     <div className="min-h-screen bg-gray-50 flex justify-center py-12 px-4 text-black">
       <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white p-8 rounded-xl shadow-lg border border-gray-100 space-y-6">
-        <h1 className="text-2xl font-bold">List an Item</h1>
-
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">List an Item</h1>
+          <span className="text-xs text-gray-400 font-mono uppercase">API: {BASE_URL.includes('localhost') ? 'Local' : 'Remote'}</span>
+        </div>
 
         {status && (
           <div className={`p-4 rounded-lg flex items-center gap-2 ${status.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
@@ -127,34 +132,67 @@ export default function Donate() {
           </div>
         )}
 
+        {/* Image Upload Area */}
         <div className="space-y-2">
           {!preview ? (
             <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
               <Camera className="w-10 h-10 text-gray-400 mb-2" />
               <p className="text-sm text-gray-500 font-semibold">Click to upload photo</p>
-              <input type="file" className="hidden" accept="image/*" onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) { setImageFile(file); setPreview(URL.createObjectURL(file)); }
-              }} />
+              <input 
+                type="file" 
+                className="hidden" 
+                accept="image/*" 
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) { 
+                    setImageFile(file); 
+                    setPreview(URL.createObjectURL(file)); 
+                  }
+                }} 
+              />
             </label>
           ) : (
             <div className="relative h-48 w-full">
               <img src={preview} alt="Preview" className="w-full h-full object-cover rounded-lg border" />
-              <button type="button" onClick={() => {setPreview(""); setImageFile(null);}} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"><X size={16}/></button>
+              <button 
+                type="button" 
+                onClick={() => {setPreview(""); setImageFile(null);}} 
+                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+              >
+                <X size={16}/>
+              </button>
             </div>
           )}
         </div>
 
+        {/* Title & Category */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input placeholder="Title" className="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
-          <select className="p-3 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-green-500" required value={formData.categoryId} onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}>
+          <input 
+            placeholder="Title" 
+            className="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" 
+            required 
+            value={formData.title} 
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })} 
+          />
+          <select 
+            className="p-3 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-green-500" 
+            required 
+            value={formData.categoryId} 
+            onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+          >
             <option value="">Category</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
 
+        {/* Condition & Quantity */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <select className="p-3 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-green-500" required value={formData.condition} onChange={(e) => setFormData({ ...formData, condition: e.target.value })}>
+          <select 
+            className="p-3 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-green-500" 
+            required 
+            value={formData.condition} 
+            onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+          >
             <option value="">Condition</option>
             <option value="NEW">New</option>
             <option value="LIKE_NEW">Like New</option>
@@ -162,18 +200,48 @@ export default function Donate() {
             <option value="FAIR">Fair</option>
             <option value="POOR">Poor</option>
           </select>
-          <input type="number" min={1} placeholder="Quantity" className="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" required value={formData.quantity} onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })} />
+          <input 
+            type="number" 
+            min={1} 
+            placeholder="Quantity" 
+            className="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" 
+            required 
+            value={formData.quantity} 
+            onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })} 
+          />
         </div>
 
+        {/* Location */}
         <div className="relative">
           <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
-          <input placeholder="Pickup Address" className="w-full p-3 pl-10 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" required value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
+          <input 
+            placeholder="Pickup Address" 
+            className="w-full p-3 pl-10 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" 
+            required 
+            value={formData.address} 
+            onChange={(e) => setFormData({ ...formData, address: e.target.value })} 
+          />
         </div>
 
-        <textarea placeholder="Description" className="p-3 border rounded-lg w-full h-32 outline-none focus:ring-2 focus:ring-green-500" required value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+        {/* Description */}
+        <textarea 
+          placeholder="Description" 
+          className="p-3 border rounded-lg w-full h-32 outline-none focus:ring-2 focus:ring-green-500 transition-all" 
+          required 
+          value={formData.description} 
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+        />
 
-        <button type="submit" disabled={isSubmitting} className="w-full bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 transition-all flex justify-center items-center gap-2">
-          {isSubmitting ? <><Loader2 className="animate-spin" size={20} /> Processing...</> : "Submit Donation"}
+        <button 
+          type="submit" 
+          disabled={isSubmitting} 
+          className="w-full bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 transition-all flex justify-center items-center gap-2"
+        >
+          {isSubmitting ? (
+            <><Loader2 className="animate-spin" size={20} /> Processing...</>
+          ) : (
+            "Submit Donation"
+          )}
         </button>
       </form>
     </div>

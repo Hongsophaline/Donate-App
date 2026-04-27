@@ -1,8 +1,13 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Camera, Check, ArrowLeft } from "lucide-react";
 import Cookies from "js-cookie";
+
+// Access the environment variable with a fallback to localhost
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const EditProfile: React.FC = () => {
   const { t } = useTranslation();
@@ -15,8 +20,8 @@ const EditProfile: React.FC = () => {
     fullName: "",
     phone: "",
     profilePic: "",
-    location: "Phnom Penh, Cambodia", // Placeholder mapping
-    bio: "I love sharing and helping the community. Looking forward to donating more!", // Placeholder mapping
+    location: "Phnom Penh, Cambodia",
+    bio: "I love sharing and helping the community. Looking forward to donating more!",
   });
 
   // Fetch profile data on mount
@@ -25,10 +30,13 @@ const EditProfile: React.FC = () => {
       try {
         const token = Cookies.get("token");
         if (!token) return;
+        
+        // Updated to use BASE_URL
         const res = await fetch(
-          "https://material-donation-backend-8.onrender.com/api/v1/auth/profile",
+          `${BASE_URL}/api/v1/auth/profile`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
+        
         if (!res.ok) throw new Error("Failed to fetch profile");
         const data = await res.json();
         setFormData((prev) => ({
@@ -57,8 +65,9 @@ const EditProfile: React.FC = () => {
       const token = Cookies.get("token");
       if (!token) throw new Error("No token found");
 
+      // Updated to use BASE_URL
       const res = await fetch(
-        "https://material-donation-backend-8.onrender.com/api/v1/auth/profile",
+        `${BASE_URL}/api/v1/auth/profile`,
         {
           method: "PUT",
           headers: {
@@ -124,7 +133,7 @@ const EditProfile: React.FC = () => {
                   {t("editProfile.profilePicture")}
                 </h2>
                 <p className="text-[11px] font-bold text-gray-400 mt-1 uppercase tracking-wider">
-                  JPG, PNG OR GIF • MAX 2MB
+                  JPG, PNG OR GIF • MAX 2MB • Env: {BASE_URL.includes('localhost') ? 'Local' : 'Prod'}
                 </p>
               </div>
             </div>
