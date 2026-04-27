@@ -9,6 +9,9 @@ import StatCard from "../components/StatCard";
 import ProfileField from "../components/ProfileField";
 import ProfileHeader from "../components/ProfileHeader";
 
+// Accessing the environment variable with a fallback to localhost
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 const ProfilePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -23,17 +26,27 @@ const ProfilePage = () => {
         if (!token) return navigate("/signup");
 
         const headers = { Authorization: `Bearer ${token}` };
+        
+        // Updated to use the BASE_URL variable
         const [pRes, rRes] = await Promise.all([
-          fetch("http://localhost:8080/api/v1/auth/profile", { headers }),
-          fetch("http://localhost:8080/api/v1/requests/received", { headers }),
+          fetch(`${BASE_URL}/api/v1/auth/profile`, { headers }),
+          fetch(`${BASE_URL}/api/v1/requests/received`, { headers }),
         ]);
 
         if (pRes.ok) {
           const profile = await pRes.json();
           setUserData(profile);
-          const requests = await rRes.json();
-          // Badge count for pending items needing action
-          setPendingCount(requests.filter((r: any) => r.status === "PENDING").length);
+          
+          if (rRes.ok) {
+            const requests = await rRes.json();
+            // Safety check to ensure requests is an array before filtering
+            const incomingRequests = Array.isArray(requests) ? requests : (requests.content || []);
+            setPendingCount(incomingRequests.filter((r: any) => r.status === "PENDING").length);
+          }
+        } else if (pRes.status === 401) {
+          // If token is invalid/expired, clear and redirect
+          Cookies.remove("token");
+          navigate("/login");
         }
       } catch (err) {
         console.error("Profile load error", err);
@@ -47,7 +60,9 @@ const ProfilePage = () => {
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-400">Loading...</div>;
   if (!userData) return null;
 
-  const joinedDate = new Date(userData.createdAt).toLocaleString("en-US", { month: "short", year: "numeric" });
+  const joinedDate = userData.createdAt 
+    ? new Date(userData.createdAt).toLocaleString("en-US", { month: "short", year: "numeric" })
+    : "Recently";
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] py-12 px-6">
@@ -64,7 +79,7 @@ const ProfilePage = () => {
             <StatCard icon={<Box size={22} />} value={userData.donationCount || 0} label="Donations" />
             <div onClick={() => navigate("/notifications")} className="cursor-pointer group">
               <StatCard 
-                icon={<Clock size={22} className={pendingCount > 0 ? "text-orange-500" : ""} />} 
+                icon={<Clock size={22} className={pendingCount > 0 ? "text-orange-500 animate-pulse" : ""} />} 
                 value={pendingCount} 
                 label="Pending for me" 
               />
@@ -89,6 +104,13 @@ const ProfilePage = () => {
           >
             Manage All Requests <ChevronRight size={18} />
           </button>
+
+          {/* Optional: Dev indicator to confirm you're using local API */}
+          <div className="mt-8 text-center">
+            <p className="text-[10px] text-gray-300 font-mono uppercase tracking-widest">
+              API Connection: {BASE_URL.includes('localhost') ? 'Localhost' : 'Remote'}
+            </p>
+          </div>
         </div>
       </div>
     </div>
