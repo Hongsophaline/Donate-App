@@ -210,9 +210,9 @@
 //         return;
 //       }
 
-//       const headers = { 
-//         Authorization: `Bearer ${token}`, 
-//         "Content-Type": "application/json" 
+//       const headers = {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": "application/json"
 //       };
 
 //       const [pRes, rRes, mRes] = await Promise.all([
@@ -240,9 +240,9 @@
 //       const token = Cookies.get("token");
 //       const res = await fetch(`http://localhost:8080/api/v1/requests/${id}/${action}`, {
 //         method: "PATCH",
-//         headers: { 
-//           Authorization: `Bearer ${token}`, 
-//           "Content-Type": "application/json" 
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           "Content-Type": "application/json"
 //         },
 //       });
 //       if (res.ok) {
@@ -280,7 +280,7 @@
 //   return (
 //     <div className="min-h-screen bg-[#FDFCFB] py-12 px-6">
 //       <div className="max-w-3xl mx-auto space-y-8">
-        
+
 //         {/* --- Profile Card --- */}
 //         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
 //           <div className="p-8">
@@ -325,10 +325,10 @@
 //         {/* --- SECTION: Incoming Requests (Donor View) --- */}
 //         <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
 //           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-//             <User size={20} className="text-orange-500" /> 
+//             <User size={20} className="text-orange-500" />
 //             Manage Incoming Requests
 //           </h2>
-          
+
 //           {receivedRequests.length === 0 ? (
 //             <p className="text-gray-400 text-center py-4">No incoming requests.</p>
 //           ) : (
@@ -342,11 +342,11 @@
 //                       Item: {req.donationTitle || "Untitled Product"}
 //                     </span>
 //                   </div>
-                  
+
 //                   <h4 className="font-bold text-gray-800 text-lg cursor-pointer hover:text-blue-600 transition-colors" onClick={() => navigate(`/profile/${req.requesterId}`)}>
 //                     Requested by: {req.requesterName}
 //                   </h4>
-                  
+
 //                   {req.status === "APPROVED" && (
 //                     <div className="flex items-center gap-2 mt-2">
 //                       <span className="text-xs text-gray-500">Contact:</span>
@@ -360,14 +360,14 @@
 //                 <div className="flex gap-2 w-full md:w-auto">
 //                   {req.status === "PENDING" ? (
 //                     <>
-//                       <button 
-//                         onClick={() => handleAction(req.id, "approve")} 
+//                       <button
+//                         onClick={() => handleAction(req.id, "approve")}
 //                         className="flex-1 md:flex-none bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1 hover:bg-green-700 transition-all shadow-sm"
 //                       >
 //                         <Check size={16}/> Approve
 //                       </button>
-//                       <button 
-//                         onClick={() => handleAction(req.id, "reject")} 
+//                       <button
+//                         onClick={() => handleAction(req.id, "reject")}
 //                         className="flex-1 md:flex-none bg-white text-red-600 border border-red-100 px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1 hover:bg-red-50 transition-all"
 //                       >
 //                         <X size={16}/> Reject
@@ -406,8 +406,8 @@
 //                   )}
 //                 </div>
 //                 <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${
-//                     req.status === "APPROVED" ? "bg-green-100 text-green-700" : 
-//                     req.status === "REJECTED" ? "bg-red-100 text-red-700" : 
+//                     req.status === "APPROVED" ? "bg-green-100 text-green-700" :
+//                     req.status === "REJECTED" ? "bg-red-100 text-red-700" :
 //                     "bg-blue-100 text-blue-700"
 //                   }`}>
 //                   {req.status}
@@ -440,7 +440,19 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
-import { MapPin, Calendar, Box, Phone, Mail, User, Check, X, Clock, Send, Package } from "lucide-react";
+import {
+  MapPin,
+  Calendar,
+  Box,
+  Phone,
+  Mail,
+  User,
+  Check,
+  X,
+  Clock,
+  Send,
+  Package,
+} from "lucide-react";
 
 import StatCard from "../components/StatCard";
 import ProfileField from "../components/ProfileField";
@@ -448,7 +460,7 @@ import ProfileHeader from "../components/ProfileHeader";
 
 interface RequestItem {
   id: string;
-  donationTitle: string; 
+  donationTitle: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
   createdAt: string;
   requesterId?: string;
@@ -486,9 +498,9 @@ const ProfilePage = () => {
         return;
       }
 
-      const headers = { 
-        Authorization: `Bearer ${token}`, 
-        "Content-Type": "application/json" 
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       };
 
       // Fetch Profile, Incoming Requests, and My Requests in parallel
@@ -519,13 +531,16 @@ const ProfilePage = () => {
       const token = Cookies.get("token");
       if (!token) return;
 
-      const res = await fetch(`http://localhost:8080/api/v1/requests/${id}/${action}`, {
-        method: "PATCH",
-        headers: { 
-          Authorization: `Bearer ${token}`, 
-          "Content-Type": "application/json" 
+      const res = await fetch(
+        `http://localhost:8080/api/v1/requests/${id}/${action}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (res.ok) {
         // Refresh the list after successful action
@@ -549,11 +564,12 @@ const ProfilePage = () => {
     fetchAllData();
   }, [navigate]);
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      Loading...
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
 
   if (!userData) return null;
 
@@ -565,7 +581,6 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-[#FDFCFB] py-12 px-6">
       <div className="max-w-3xl mx-auto space-y-8">
-        
         {/* --- Profile Card --- */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-8">
@@ -584,7 +599,9 @@ const ProfilePage = () => {
               />
               <StatCard
                 icon={<Clock size={22} />}
-                value={receivedRequests.filter(r => r.status === 'PENDING').length}
+                value={
+                  receivedRequests.filter((r) => r.status === "PENDING").length
+                }
                 label="Pending for me"
               />
               <StatCard
@@ -596,12 +613,24 @@ const ProfilePage = () => {
 
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <ProfileField label={t("profile.labels.fullName")} value={userData.fullName} />
-                <ProfileField label={t("profile.labels.phone")} value={userData.phone} />
+                <ProfileField
+                  label={t("profile.labels.fullName")}
+                  value={userData.fullName}
+                />
+                <ProfileField
+                  label={t("profile.labels.phone")}
+                  value={userData.phone}
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <ProfileField label={t("profile.labels.email")} value={userData.email || "—"} />
-                <ProfileField label={t("profile.stats.dob")} value={userData.dob || "—"} />
+                <ProfileField
+                  label={t("profile.labels.email")}
+                  value={userData.email || "—"}
+                />
+                <ProfileField
+                  label={t("profile.stats.dob")}
+                  value={userData.dob || "—"}
+                />
               </div>
             </div>
           </div>
@@ -610,15 +639,20 @@ const ProfilePage = () => {
         {/* --- Incoming Requests --- */}
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <User size={20} className="text-orange-500" /> 
+            <User size={20} className="text-orange-500" />
             Manage Incoming Requests
           </h2>
-          
+
           {receivedRequests.length === 0 ? (
-            <p className="text-gray-400 text-center py-4">No incoming requests.</p>
+            <p className="text-gray-400 text-center py-4">
+              No incoming requests.
+            </p>
           ) : (
             receivedRequests.map((req) => (
-              <div key={req.id} className="p-5 bg-gray-50 rounded-2xl border border-gray-100 mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div
+                key={req.id}
+                className="p-5 bg-gray-50 rounded-2xl border border-gray-100 mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+              >
                 <div className="flex-1">
                   <div className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1 rounded-lg mb-2 border border-blue-100">
                     <Package size={14} />
@@ -626,16 +660,19 @@ const ProfilePage = () => {
                       Item: {req.donationTitle || "Untitled Product"}
                     </span>
                   </div>
-                  
+
                   <h4 className="font-bold text-gray-800 text-lg">
                     Requested by: {req.requesterName}
                   </h4>
-                  
+
                   {req.status === "APPROVED" && (
                     <div className="flex items-center gap-2 mt-2">
                       <span className="text-xs text-gray-500">Contact:</span>
-                      <a href={`tel:${req.requesterPhone}`} className="text-green-600 flex items-center gap-1 text-sm font-bold">
-                        <Phone size={14}/> {req.requesterPhone}
+                      <a
+                        href={`tel:${req.requesterPhone}`}
+                        className="text-green-600 flex items-center gap-1 text-sm font-bold"
+                      >
+                        <Phone size={14} /> {req.requesterPhone}
                       </a>
                     </div>
                   )}
@@ -644,22 +681,24 @@ const ProfilePage = () => {
                 <div className="flex gap-2 w-full md:w-auto">
                   {req.status === "PENDING" ? (
                     <>
-                      <button 
-                        onClick={() => handleAction(req.id, "approve")} 
+                      <button
+                        onClick={() => handleAction(req.id, "approve")}
                         className="flex-1 md:flex-none bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1 hover:bg-green-700 transition-all shadow-sm"
                       >
-                        <Check size={16}/> Approve
+                        <Check size={16} /> Approve
                       </button>
-                      <button 
-                        onClick={() => handleAction(req.id, "reject")} 
+                      <button
+                        onClick={() => handleAction(req.id, "reject")}
                         className="flex-1 md:flex-none bg-white text-red-600 border border-red-100 px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1 hover:bg-red-50 transition-all"
                       >
-                        <X size={16}/> Reject
+                        <X size={16} /> Reject
                       </button>
                     </>
                   ) : (
-                    <span className={`w-full md:w-auto text-center px-4 py-2 rounded-xl text-sm font-black uppercase ${req.status === "APPROVED" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                        {req.status}
+                    <span
+                      className={`w-full md:w-auto text-center px-4 py-2 rounded-xl text-sm font-black uppercase ${req.status === "APPROVED" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+                    >
+                      {req.status}
                     </span>
                   )}
                 </div>
@@ -674,26 +713,45 @@ const ProfilePage = () => {
             <Send size={20} className="text-blue-500" /> My Requests Status
           </h2>
           {myRequests.length === 0 ? (
-             <p className="text-gray-400 text-center py-4">You haven't requested anything yet.</p>
+            <p className="text-gray-400 text-center py-4">
+              You haven't requested anything yet.
+            </p>
           ) : (
             myRequests.map((req) => (
-              <div key={req.id} className="p-5 bg-gray-50 rounded-2xl border border-gray-100 mb-4 flex justify-between items-center">
+              <div
+                key={req.id}
+                className="p-5 bg-gray-50 rounded-2xl border border-gray-100 mb-4 flex justify-between items-center"
+              >
                 <div>
-                  <h4 className="font-bold text-gray-800 text-lg">{req.donationTitle}</h4>
+                  <h4 className="font-bold text-gray-800 text-lg">
+                    {req.donationTitle}
+                  </h4>
                   {req.status === "APPROVED" && (
                     <div className="mt-2">
-                      <p className="text-xs text-gray-500">Donor: <span className="font-bold text-gray-700">{req.donorName}</span></p>
-                      <a href={`tel:${req.donorPhone}`} className="text-blue-600 text-sm font-bold flex items-center gap-1 mt-1">
-                        <Phone size={14}/> {req.donorPhone}
+                      <p className="text-xs text-gray-500">
+                        Donor:{" "}
+                        <span className="font-bold text-gray-700">
+                          {req.donorName}
+                        </span>
+                      </p>
+                      <a
+                        href={`tel:${req.donorPhone}`}
+                        className="text-blue-600 text-sm font-bold flex items-center gap-1 mt-1"
+                      >
+                        <Phone size={14} /> {req.donorPhone}
                       </a>
                     </div>
                   )}
                 </div>
-                <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${
-                    req.status === "APPROVED" ? "bg-green-100 text-green-700" : 
-                    req.status === "REJECTED" ? "bg-red-100 text-red-700" : 
-                    "bg-blue-100 text-blue-700"
-                  }`}>
+                <span
+                  className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${
+                    req.status === "APPROVED"
+                      ? "bg-green-100 text-green-700"
+                      : req.status === "REJECTED"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-blue-100 text-blue-700"
+                  }`}
+                >
                   {req.status}
                 </span>
               </div>
