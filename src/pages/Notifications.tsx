@@ -1,122 +1,176 @@
-import React from "react";
-import { useTranslation } from "react-i18next"; // 1. Import hook
-import {
-  Check,
-  X,
-  Clock,
-  Bell,
-  CheckCircle2,
-  Package,
-  Info,
-} from "lucide-react";
+"use client";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import { User, Send, Package, Check, X, ArrowLeft } from "lucide-react";
+
+// Accessing the environment variable with a fallback to localhost
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
+interface RequestItem {
+  id: string;
+  donationTitle: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  requesterName?: string;
+  requesterPhone?: string;
+  donorName?: string;
+  donorPhone?: string;
+}
 
 const NotificationsPage = () => {
-  const { t } = useTranslation(); // 2. Initialize translation
+  const navigate = useNavigate();
+  const [receivedRequests, setReceivedRequests] = useState<RequestItem[]>([]);
+  const [myRequests, setMyRequests] = useState<RequestItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data - In a real app, 'item' and 'user' would be variables passed to the translation
-  const pendingRequests = [
-    {
-      id: 1,
-      user: "Visal Phan",
-      item: "Winter Jacket - Size M",
-      message:
-        "This jacket would be perfect for the cold season. Thank you for donating!",
-      time: "Mar 31, 09:30 PM",
-      image:
-        "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=100&h=100&fit=crop",
-    },
-    {
-      id: 2,
-      user: "Sophaline Hong",
-      item: "Kitchen Utensils Set",
-      message: "!!!",
-      time: "Apr 2, 09:32 AM",
-      image:
-        "https://images.unsplash.com/photo-1584346133934-a3afd2a33c4c?w=100&h=100&fit=crop",
-    },
-  ];
+  const fetchData = async () => {
+    try {
+      const token = Cookies.get("token");
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+
+      const [rRes, mRes] = await Promise.all([
+        fetch(`${BASE_URL}/api/v1/requests/received`, { headers }),
+        fetch(`${BASE_URL}/api/v1/requests/my`, { headers }),
+      ]);
+
+      setReceivedRequests(rRes.ok ? await rRes.json() : []);
+      setMyRequests(mRes.ok ? await mRes.json() : []);
+    } catch (err) {
+      console.error("Fetch failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAction = async (id: string, action: "approve" | "reject") => {
+    try {
+      const token = Cookies.get("token");
+      const res = await fetch(`${BASE_URL}/api/v1/requests/${id}/${action}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.ok) fetchData();
+    } catch (err) {
+      console.error("Action failed:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-400">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {t("notifications.title")}
-          </h1>
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <p className="text-gray-500 text-sm font-medium">
-              {t("notifications.subtitle")}
-            </p>
-            <span className="bg-red-100 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded-md">
-              {t("notifications.unreadCount", { count: 4 })}
-            </span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#FDFCFB] py-12 px-6 text-gray-900">
+      <div className="max-w-4xl mx-auto space-y-10">
+        
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-500 hover:text-gray-800 font-semibold mb-4">
+          <ArrowLeft size={20} /> Back to Profile
+        </button>
 
-        {/* Pending Requests */}
-        <div className="mb-10">
-          <div className="flex items-center gap-2 mb-5">
-            <Clock className="text-orange-500" size={18} />
-            <h2 className="font-bold text-gray-800 tracking-tight">
-              {t("notifications.pendingTitle")}
+        {/* SECTION 1: INCOMING REQUESTS */}
+        <div className="bg-white p-10 rounded-[32px] shadow-sm border border-gray-100">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-bold flex items-center gap-3">
+              <User size={24} className="text-orange-500" /> Manage Incoming Requests
             </h2>
-            <span className="bg-orange-100 text-orange-600 text-[10px] px-2 py-0.5 rounded-full font-bold">
-              2
+            <span className="text-[10px] font-mono text-gray-300 uppercase">
+              {BASE_URL.includes('localhost') ? 'Local API' : 'Live API'}
             </span>
           </div>
 
-          <div className="space-y-4">
-            {pendingRequests.map((req) => (
-              <div
-                key={req.id}
-                className="bg-[#FFFBF5] border border-orange-100 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-5 shadow-sm"
-              >
-                <img
-                  src={req.image}
-                  alt="item"
-                  className="w-20 h-20 rounded-2xl object-cover border border-orange-50"
-                />
-                <div className="flex-grow text-center sm:text-left">
-                  <p className="text-sm text-gray-800 leading-tight">
-                    <span className="font-bold">{req.user}</span>{" "}
-                    {t("notifications.requested", { item: req.item })}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1 italic">
-                    "{req.message}"
-                  </p>
-                  <p className="text-[10px] text-gray-400 mt-3 font-bold uppercase tracking-wider">
-                    {req.time}
-                  </p>
+          <div className="space-y-6">
+            {receivedRequests.length > 0 ? (
+              receivedRequests.map((req) => (
+                <div key={req.id} className="p-8 bg-[#F9FAFB] rounded-[24px] border border-gray-50 flex flex-col md:flex-row justify-between items-center gap-6">
+                  <div className="flex-1 w-full space-y-2">
+                    <div className="inline-flex items-center gap-2 bg-[#E0E7FF] text-[#3730A3] px-4 py-1 rounded-full border border-[#C7D2FE]">
+                      <Package size={14} />
+                      <span className="text-[11px] font-bold uppercase">ITEM: {req.donationTitle}</span>
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-800">Requested by: {req.requesterName}</h4>
+
+                    {req.status === "APPROVED" && (
+                      <div className="flex items-center gap-1.5 text-sm">
+                        <span className="text-gray-400">Contact:</span>
+                        <a href={`tel:${req.requesterPhone}`} className="text-green-500 font-bold hover:underline">
+                          {req.requesterPhone}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3">
+                    {req.status === "PENDING" ? (
+                      <>
+                        <button onClick={() => handleAction(req.id, "approve")} className="bg-green-500 text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-green-600 transition-colors">
+                          <Check size={18} /> Approve
+                        </button>
+                        <button onClick={() => handleAction(req.id, "reject")} className="bg-white text-red-500 border border-red-200 px-6 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-red-50 transition-colors">
+                          <X size={18} /> Reject
+                        </button>
+                      </>
+                    ) : (
+                      <span className={`px-4 py-1 rounded-lg font-bold text-sm ${req.status === "APPROVED" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}>
+                        {req.status}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex gap-2 w-full sm:w-auto">
-                  <button className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-[#2DBB74] hover:bg-[#259e62] text-white px-5 py-2.5 rounded-xl text-xs font-bold transition">
-                    <Check size={14} /> {t("notifications.approve")}
-                  </button>
-                  <button className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-[#EF4444] hover:bg-[#dc2626] text-white px-5 py-2.5 rounded-xl text-xs font-bold transition">
-                    <X size={14} /> {t("notifications.reject")}
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-center text-gray-400 py-4 font-medium">No incoming requests yet.</p>
+            )}
           </div>
         </div>
 
-        {/* All Notifications List */}
-        <div>
-          <div className="flex items-center justify-between mb-5 px-1">
-            <div className="flex items-center gap-2">
-              <Bell className="text-[#2DBB74]" size={18} />
-              <h2 className="font-bold text-gray-800 tracking-tight">
-                {t("notifications.allTitle")}
-              </h2>
-            </div>
-            <button className="text-[11px] text-[#2DBB74] font-bold flex items-center gap-1 hover:opacity-80 transition">
-              <Check size={12} strokeWidth={3} /> {t("notifications.markRead")}
-            </button>
-          </div>
+        {/* SECTION 2: MY REQUESTS */}
+        <div className="bg-white p-10 rounded-[32px] shadow-sm border border-gray-100">
+          <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
+            <Send size={24} className="text-blue-500" /> My Requests Status
+          </h2>
 
-          {/* ... (History list remains similar, using translated strings for static text) */}
+          <div className="space-y-6">
+            {myRequests.length > 0 ? (
+              myRequests.map((req) => (
+                <div key={req.id} className="p-8 bg-[#F9FAFB] rounded-[24px] border border-gray-50 flex flex-col md:flex-row justify-between items-center gap-6">
+                  <div className="flex-1 w-full space-y-2">
+                    <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-1 rounded-full border border-blue-100">
+                      <Package size={14} />
+                      <span className="text-[11px] font-bold uppercase">ITEM: {req.donationTitle}</span>
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-800">Donor: {req.donorName}</h4>
+                    
+                    {req.status === "APPROVED" && (
+                      <div className="flex items-center gap-1.5 text-sm">
+                        <span className="text-gray-400">Contact Donor:</span>
+                        <a href={`tel:${req.donorPhone}`} className="text-green-500 font-bold hover:underline">
+                          {req.donorPhone}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  <span className={`px-4 py-1 rounded-lg font-bold text-sm ${
+                    req.status === "APPROVED" ? "bg-green-100 text-green-600" : 
+                    req.status === "REJECTED" ? "bg-red-100 text-red-600" : "bg-orange-100 text-orange-600"
+                  }`}>
+                    {req.status}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-gray-400 py-4 font-medium">You haven't requested anything yet.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

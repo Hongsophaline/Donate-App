@@ -1,9 +1,9 @@
 export const uploadImageToCloudinary = async (file: File) => {
   const formData = new FormData();
-
+  
   // These match your screenshot exactly
   formData.append("file", file);
-  formData.append("upload_preset", "Mary_default");
+  formData.append("upload_preset", "Mary_default"); 
 
   try {
     const res = await fetch(
@@ -11,7 +11,7 @@ export const uploadImageToCloudinary = async (file: File) => {
       {
         method: "POST",
         body: formData,
-      },
+      }
     );
 
     const data = await res.json();

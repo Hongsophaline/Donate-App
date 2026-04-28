@@ -1,7 +1,11 @@
+"use client";
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+
+// Accessing the environment variable with a fallback to localhost
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 interface SignUpForm {
   fullName: string;
@@ -74,7 +78,7 @@ const SignUpPage: React.FC = () => {
       return;
     }
 
-    // 2. Prepare Payloads exactly as requested
+    // 2. Prepare Payloads
     const payload =
       userType === "individual"
         ? {
@@ -84,7 +88,7 @@ const SignUpPage: React.FC = () => {
             userType: "INDIVIDUAL",
             dob: formData.dateOfBirth,
             avatarUrl:
-              "https://api.dicebear.com/7.x/avataaars/svg?seed=individual", // Default string
+              "https://api.dicebear.com/7.x/avataaars/svg?seed=individual",
           }
         : {
             fullName: formData.fullName,
@@ -92,19 +96,17 @@ const SignUpPage: React.FC = () => {
             email: formData.organizationEmail,
             password: formData.password,
             userType: "Organization",
-            avatarUrl: "https://api.dicebear.com/7.x/initials/svg?seed=org", // Default string
+            avatarUrl: "https://api.dicebear.com/7.x/initials/svg?seed=org",
           };
 
     console.log("--- Request Started ---");
-    console.log(
-      "Target URL: https://material-donation-backend-4.onrender.com/api/v1/auth/register",
-    );
+    console.log(`Target URL: ${BASE_URL}/api/v1/auth/register`);
     console.log("Payload being sent:", payload);
 
     // 3. Fetch API
     try {
       const response = await fetch(
-        "https://material-donation-backend-4.onrender.com/api/v1/auth/register",
+        `${BASE_URL}/api/v1/auth/register`,
         {
           method: "POST",
           headers: {
@@ -117,14 +119,12 @@ const SignUpPage: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        // This catches the 400 Bad Request you saw in your screenshot
         console.error("Registration Failed (Server Response):", data);
         throw new Error(
           data.message || "Registration failed. Check console for details.",
         );
       }
 
-      // SUCCESS: Log data to console
       console.log("--- Registration Success! ---");
       console.log("Response Data:", data);
 
@@ -141,9 +141,12 @@ const SignUpPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center py-12 px-4">
       <div className="w-full max-w-xl flex flex-col items-center">
-        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-8">
+        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">
           {t("signup.title")}
         </h1>
+        <p className="text-[10px] text-gray-300 font-mono mb-8 uppercase tracking-widest">
+          Env: {BASE_URL.includes('localhost') ? 'Localhost' : 'Remote'}
+        </p>
 
         {/* User Type Switcher */}
         <div className="flex w-full mb-8 bg-gray-100 rounded-md p-1">

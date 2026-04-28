@@ -4,25 +4,6 @@ import React, { useState, useEffect } from "react";
 import { MapPin, Loader2, CheckCircle2, AlertCircle, Camera, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dml6kygxk/image/upload";
-const UPLOAD_PRESET = "Mary_default";
-const BACKEND_URL = "https://material-donation-backend-4.onrender.com";
-
-async function uploadImageToCloudinary(file: File): Promise<string> {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", UPLOAD_PRESET);
-
-  const res = await fetch(CLOUDINARY_URL, {
-    method: "POST",
-    body: formData,
-  });
-
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error?.message || "Cloudinary Upload Failed");
-  return data.secure_url;
-}
-
 export default function Donate() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<any[]>([]);
@@ -40,19 +21,22 @@ export default function Donate() {
     address: "",
     quantity: 1,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<{type: 'success'|'error', text: string}|null>(null);
 
   const getAuthHeader = () => {
     const token = localStorage.getItem("token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    return token ? { "Authorization": `Bearer ${token}` } : {} as Record<string, string>;
   };
 
+  // Fetch categories (public)
   useEffect(() => {
-    fetch(`${BACKEND_URL}/api/categories`, {
-      headers: getAuthHeader() as any,
+    fetch("https://material-donation-backend-3.onrender.com/api/categories", { 
+      headers: getAuthHeader() 
     })
-      .then((res) => res.json())
-      .then((data) => setCategories(Array.isArray(data) ? data : data.content || []))
-      .catch((err) => console.error("Category Load Error:", err));
+      .then(res => res.json())
+      .then(data => setCategories(Array.isArray(data) ? data : (data.content || [])))
+      .catch(err => console.error("Category Load Error:", err));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,49 +48,39 @@ export default function Donate() {
     setStatus(null);
 
     try {
-      // 1. Upload to Cloudinary
-      const imageUrl = await uploadImageToCloudinary(imageFile);
+      // Fix for the 500 error: Ensure quantity is a Number
+      const payload = {
+        ...formData,
+        quantity: Number(formData.quantity)
+      };
 
-      // 2. Create the Donation
-      const res = await fetch(`${BACKEND_URL}/api/v1/donations`, {
+      const res = await fetch("https://material-donation-backend-3.onrender.com/api/v1/donations", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          ...getAuthHeader() as any 
+          "Content-Type": "application/json", 
+          ...getAuthHeader() 
         },
-        body: JSON.stringify({
-          ...formData,
-          quantity: Number(formData.quantity),
-        }),
+        body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to create donation");
-      const donation = await res.json();
-
-      // 3. Attach image URL to the created donation
-      if (imageUrl && donation.id) {
-        await fetch(
-          `${BACKEND_URL}/api/v1/donations/${donation.id}/images?imageUrl=${encodeURIComponent(imageUrl)}`,
-          {
-            method: "POST",
-            headers: getAuthHeader() as any,
-          }
-        );
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || "Failed to create donation.");
       }
 
       setStatus({ type: "success", text: "Donation successful! Redirecting..." });
       setTimeout(() => navigate("/browse"), 2000);
     } catch (err: any) {
-      setStatus({ type: "error", text: err.message });
+      setStatus({ type: 'error', text: err.message });
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center py-12 px-4 text-black">
-      <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white p-8 rounded-xl shadow-lg border border-gray-100 space-y-6">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-4 text-black font-sans">
+      <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white border rounded-xl p-8 space-y-6 shadow-sm">
         <h1 className="text-2xl font-bold">List an Item</h1>
-
+        
         {status && (
           <div className={`p-4 rounded-lg flex items-center gap-2 ${status.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
             {status.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
@@ -114,52 +88,71 @@ export default function Donate() {
           </div>
         )}
 
-        <div className="space-y-2">
-          {!preview ? (
-            <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
-              <Camera className="w-10 h-10 text-gray-400 mb-2" />
-              <p className="text-sm text-gray-500 font-semibold">Click to upload photo</p>
-              <input type="file" className="hidden" accept="image/*" onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) { setImageFile(file); setPreview(URL.createObjectURL(file)); }
-              }} />
-            </label>
-          ) : (
-            <div className="relative h-48 w-full">
-              <img src={preview} alt="Preview" className="w-full h-full object-cover rounded-lg border" />
-              <button type="button" onClick={() => {setPreview(""); setImageFile(null);}} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"><X size={16}/></button>
+        <div className="space-y-4">
+          <label className="block text-sm font-semibold">Title</label>
+          <input 
+            placeholder="e.g., Wooden Dining Table" 
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" 
+            required 
+            onChange={e => setFormData({...formData, title: e.target.value})} 
+          />
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold">Category</label>
+              <select 
+                className="w-full p-3 border rounded-lg bg-white" 
+                required 
+                value={formData.categoryId}
+                onChange={e => setFormData({...formData, categoryId: e.target.value})}
+              >
+                <option value="">Select Category</option>
+                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
             </div>
-          )}
+            <div>
+              <label className="block text-sm font-semibold">Quantity</label>
+              <input 
+                type="number" 
+                min="1"
+                className="w-full p-3 border rounded-lg" 
+                value={formData.quantity}
+                onChange={e => setFormData({...formData, quantity: parseInt(e.target.value) || 1})}
+              />
+            </div>
+          </div>
+
+          <label className="block text-sm font-semibold">Description</label>
+          <textarea 
+            placeholder="Describe the item..." 
+            className="w-full p-3 border rounded-lg" 
+            rows={3} 
+            required 
+            onChange={e => setFormData({...formData, description: e.target.value})} 
+          />
+          
+          <label className="block text-sm font-semibold">Pickup Address</label>
+          <input 
+            placeholder="Location" 
+            className="w-full p-3 border rounded-lg" 
+            required 
+            onChange={e => setFormData({...formData, location: e.target.value})} 
+          />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input placeholder="Title" className="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
-          <select className="p-3 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-green-500" required value={formData.categoryId} onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}>
-            <option value="">Category</option>
-            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <select className="p-3 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-green-500" required value={formData.condition} onChange={(e) => setFormData({ ...formData, condition: e.target.value })}>
-            <option value="">Condition</option>
-            <option value="NEW">New</option>
-            <option value="LIKE_NEW">Like New</option>
-            <option value="GOOD">Good</option>
-            <option value="FAIR">Fair</option>
-          </select>
-          <input type="number" min={1} placeholder="Quantity" className="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" required value={formData.quantity} onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })} />
-        </div>
+        <textarea 
+          placeholder="Description" 
+          className="p-3 border rounded-lg w-full h-32 outline-none focus:ring-2 focus:ring-green-500" 
+          required 
+          value={formData.description} 
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+        />
 
-        <div className="relative">
-          <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
-          <input placeholder="Pickup Address" className="w-full p-3 pl-10 border rounded-lg outline-none focus:ring-2 focus:ring-green-500" required value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
-        </div>
-
-        <textarea placeholder="Description" className="p-3 border rounded-lg w-full h-32 outline-none focus:ring-2 focus:ring-green-500" required value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
-
-        <button type="submit" disabled={isSubmitting} className="w-full bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 transition-all flex justify-center items-center gap-2">
-          {isSubmitting ? <><Loader2 className="animate-spin" size={20} /> Processing...</> : "Submit Donation"}
+        <button 
+          disabled={isSubmitting} 
+          className="w-full bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 transition-all"
+        >
+          {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "Submit Donation"}
         </button>
       </form>
     </div>

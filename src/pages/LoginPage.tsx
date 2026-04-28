@@ -1,8 +1,13 @@
+"use client";
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Eye, EyeOff } from "lucide-react";
-import Cookies from "js-cookie"; // <-- import js-cookie
+import Cookies from "js-cookie";
+
+// Access the environment variable with a fallback to localhost
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const LoginPage: React.FC = () => {
   const { t } = useTranslation();
@@ -21,7 +26,7 @@ const LoginPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://material-donation-backend-4.onrender.com/api/v1/auth/login",
+        `${BASE_URL}/api/v1/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -35,11 +40,11 @@ const LoginPage: React.FC = () => {
         throw new Error(data.message || "Invalid credentials");
       }
 
-      // ✅ Store token in cookies instead of localStorage
+      // ✅ Store token in cookies
       if (data.token) {
         Cookies.set("token", data.token, {
           expires: 7, // 7 days expiration
-          secure: true, // send only over HTTPS
+          secure: true, // send only over HTTPS (works on localhost in most browsers)
           sameSite: "Strict", // CSRF protection
         });
       }
@@ -56,9 +61,13 @@ const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center py-12 px-4">
       <div className="w-full max-w-xl flex flex-col items-center">
-        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-12">
+        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">
           {t("login.title")}
         </h1>
+        {/* Subtle indicator for which API you're hitting */}
+        <p className="text-[10px] text-gray-300 font-mono mb-12 uppercase tracking-widest">
+          Connect: {BASE_URL.includes('localhost') ? 'Local Dev' : 'Production'}
+        </p>
 
         <form onSubmit={handleSubmit} className="w-full space-y-6">
           <div className="flex flex-col space-y-1.5">

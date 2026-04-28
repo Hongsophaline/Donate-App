@@ -1,63 +1,72 @@
-"use client";
-
+import React from 'react';
 import { MapPin, Clock } from "lucide-react";
 
-export interface DonationItem {
-  id: number;
+interface DonationItem {
+  id: string;
   title: string;
   location: string;
-  time: string;
+  timeAgo: string;
   category: string;
-  condition: string;
-  image: string;
+  imageUrl: string;
+  condition: string; // Dynamic condition (New, Good, etc.)
 }
 
-interface Props {
-  item: DonationItem;
-}
+const DonationCard = ({ item, onOpenRequest }: { item: any; onOpenRequest: (id: string) => void }) => {
+  // Logic to match the peach color in your screenshot for specific conditions
+  const getBadgeColor = (condition: string) => {
+    if (condition === "Like New" || condition === "New") return "bg-[#DEC0B1] text-[#A66E53]";
+    return "bg-[#D9D9D9] text-gray-700"; // Default gray for others
+  };
 
-export default function DonationCard({ item }: Props) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
-      <div className="h-56 w-full bg-gray-100">
-        <img
-          src={item.image}
-          alt={item.title}
-          className="w-full h-full object-cover"
-        />
+    <div className="bg-gray-100 rounded-2xl shadow-sm overflow-hidden flex flex-col p-3 border border-gray-200 w-full max-w-sm mx-auto">
+      {/* Image Container */}
+      <div className="h-56 w-full rounded-xl overflow-hidden mb-4 bg-white">
+        <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
       </div>
-      <div className="p-5 flex flex-col flex-grow">
-        <h3 className="text-md font-semibold text-gray-900 mb-2">
-          {item.title}
-        </h3>
-        <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3.5 w-3.5" />
-            {item.location}
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5" />
-            {item.time}
-          </span>
+
+      {/* Info Container */}
+      <div className="px-1 flex flex-col gap-3">
+        <h3 className="text-gray-900 font-bold text-xl truncate">{item.title}</h3>
+
+        <div className="flex items-center gap-4 text-gray-500 text-sm font-medium">
+          <div className="flex items-center gap-1">
+            <MapPin size={16} className="text-gray-400" />
+            <span>{item.location}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Clock size={16} className="text-gray-400" />
+            <span>{item.timeAgo}</span>
+          </div>
         </div>
-        <div className="flex gap-2 mb-4">
-          <span className="px-3 py-1 bg-gray-100 text-xs rounded-full">
+
+        {/* Tags Row */}
+        <div className="flex items-center justify-between mt-1">
+          <span className="bg-[#D9D9D9] text-gray-700 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider">
             {item.category}
           </span>
-          <span
-            className={`px-3 py-1 text-xs rounded-full ${
-              item.condition === "Like New"
-                ? "bg-orange-100 text-orange-800"
-                : "bg-amber-100 text-amber-800"
-            }`}
-          >
+          <span className={`${getBadgeColor(item.condition)} px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider`}>
             {item.condition}
           </span>
         </div>
-        <button className="mt-auto w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-md">
+
+        {/* Action Button */}
+        <button 
+          onClick={() => onOpenRequest(item.id)}
+          className="w-full mt-3 py-3 border-2 border-[#C84C0E] text-[#C84C0E] font-bold rounded-xl hover:bg-[#C84C0E] hover:text-white transition-all text-base uppercase tracking-widest"
+        >
           Request Item
         </button>
+          <button 
+  onClick={() => onOpenRequest(item.id)} // This now triggers the Detail Modal in Browse.tsx
+  className="text-orange-500 bg-orange-50 px-1 py-3 rounded text-xs font-semibold hover:bg-orange-100 transition-colors"
+>
+  Read More
+</button>
       </div>
+    
     </div>
   );
-}
+};
+
+export default DonationCard;
