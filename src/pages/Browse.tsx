@@ -45,46 +45,63 @@ const Browse: React.FC = () => {
     fetchCategories();
   }, []);
 
-  // 2. Fetch Donations
-  useEffect(() => {
-    const fetchDonations = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        // Construct URL based on category selection
-        let url = `${BASE_URL}/api/v1/donations`;
-        if (selectedCategoryId !== "All") {
-          url += `?categoryId=${selectedCategoryId}`;
-        }
-        
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-        
-        const data = await res.json();
-        const items = Array.isArray(data) ? data : data.content || [];
+// 2. Fetch Donations
+useEffect(() => {
+  const fetchDonations = async () => {
+    setIsLoading(true);
+    setError(null);
 
-        const mappedItems = items.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          description: item.description || "No description provided.",
-          quantity: item.quantity || 1,
-          location: item.address || "Phnom Penh",
-          timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "Recently",
-          category: item.category?.name || "General",
-          imageUrl: item.imageUrls?.[0] || "https://via.placeholder.com/400x300",
-          condition: item.condition === "POOR" ? "Old" : 
-                     item.condition === "FAIR" ? "Fair" : 
-                     item.condition === "LIKE_NEW" ? "Like New" : "Good"
-        }));
-        setDonations(mappedItems);
-      } catch (err: any) { 
-        setError(err.message); 
-      } finally { 
-        setIsLoading(false); 
+    try {
+      let url = `${BASE_URL}/api/v1/donations`;
+
+      // Add category filter if not "All"
+      if (selectedCategoryId !== "All") {
+        url += `?categoryId=${selectedCategoryId}`;
       }
-    };
-    fetchDonations();
-  }, [selectedCategoryId]);
+
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          // Do NOT send token here for public GET
+        },
+      });
+
+      if (!res.ok) {
+        if (res.status === 403) {
+          throw new Error("Access denied. Please try again later.");
+        }
+        throw new Error(`Server error: ${res.status}`);
+      }
+
+      const data = await res.json();
+      const items = Array.isArray(data) ? data : data.content || [];
+
+      const mappedItems = items.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        description: item.description || "No description provided.",
+        quantity: item.quantity || 1,
+        location: item.address || "Phnom Penh",
+        timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "Recently",
+        category: item.category?.name || "General",
+        imageUrl: item.imageUrls?.[0] || "https://via.placeholder.com/400x300",
+        condition: item.condition === "POOR" ? "Old" : 
+                   item.condition === "FAIR" ? "Fair" : 
+                   item.condition === "LIKE_NEW" ? "Like New" : "Good"
+      }));
+
+      setDonations(mappedItems);
+    } catch (err: any) {
+      console.error("Donations Load Error:", err);
+      setError(err.message || "Failed to load donations. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchDonations();
+}, [selectedCategoryId]);   // Re-fetch when category changes
 
   // 3. Request Logic
   const handleSendRequest = async () => {

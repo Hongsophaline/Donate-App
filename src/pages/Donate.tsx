@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { MapPin, Loader2, CheckCircle2, AlertCircle, Camera, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
-// Environment Configuration
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dml6kygxk/image/upload";
 const UPLOAD_PRESET = "Mary_default";
 
@@ -14,11 +15,7 @@ async function uploadImageToCloudinary(file: File): Promise<string> {
   formData.append("file", file);
   formData.append("upload_preset", UPLOAD_PRESET);
 
-  const res = await fetch(CLOUDINARY_URL, {
-    method: "POST",
-    body: formData,
-  });
-
+  const res = await fetch(CLOUDINARY_URL, { method: "POST", body: formData });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || "Cloudinary Upload Failed");
   return data.secure_url;
@@ -40,26 +37,28 @@ export default function Donate() {
     condition: "",
     address: "",
     quantity: 1,
+    latitude: 11.5564,   // Phnom Penh default
+    longitude: 104.9282,
   });
 
-  const getAuthHeader = () => {
-    const token = localStorage.getItem("token");
-    return token ? { "Authorization": `Bearer ${token}` } : {};
+  const getAuthHeader = (): HeadersInit => {
+    const token = Cookies.get("token");
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    return headers;
   };
 
-  // Fetch categories using the local/env BASE_URL
+  // Fetch categories (public)
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/api/categories`, {
-          headers: getAuthHeader() as any,
-        });
-
+        const res = await fetch(`${API_BASE_URL}/api/categories`);
         if (!res.ok) {
           console.error(`Failed to fetch categories: ${res.status}`);
           return;
         }
-
         const data = await res.json();
         setCategories(Array.isArray(data) ? data : data.content || []);
       } catch (err) {
@@ -79,32 +78,45 @@ export default function Donate() {
     setStatus(null);
 
     try {
-      // 1. Upload to Cloudinary
+      // 1. Upload image to Cloudinary
       const imageUrl = await uploadImageToCloudinary(imageFile);
 
-      // 2. Submit Donation Data
-      const res = await fetch(`${BASE_URL}/api/v1/donations`, {
+      // 2. Create donation
+      const res = await fetch(`${API_BASE_URL}/api/v1/donations`, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          ...getAuthHeader() as any 
+          ...getAuthHeader(),
         },
         body: JSON.stringify({
-          ...formData,
-          quantity: Number(formData.quantity),
+          title: formData.title,
+          description: formData.description,
+          categoryId: formData.categoryId,
+          condition: formData.condition,
+          address: formData.address,
+          latitude: formData.latitude,
+          longitude: formData.longitude,
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to create donation");
+      if (!res.ok) {
+        const errorText = await res.text().catch(() => "");
+        console.error("Donation creation failed:", res.status, errorText);
+        if (res.status === 403) {
+          throw new Error("Access denied. Please log in again.");
+        }
+        throw new Error(`Failed to create donation: ${res.status}`);
+      }
+
       const donation = await res.json();
 
-      // 3. Link Image to Donation
+      // 3. Link image
       if (imageUrl && donation.id) {
         await fetch(
-          `${BASE_URL}/api/v1/donations/${donation.id}/images?imageUrl=${encodeURIComponent(imageUrl)}`,
+          `${API_BASE_URL}/api/v1/donations/${donation.id}/images?imageUrl=${encodeURIComponent(imageUrl)}`,
           {
             method: "POST",
-            headers: getAuthHeader() as any,
+            headers: getAuthHeader(),
           }
         );
       }
@@ -112,7 +124,9 @@ export default function Donate() {
       setStatus({ type: "success", text: "Donation successful! Redirecting..." });
       setTimeout(() => navigate("/browse"), 2000);
     } catch (err: any) {
-      setStatus({ type: "error", text: err.message });
+      console.error("Submit error:", err);
+      setStatus({ type: "error", text: err.message || "Failed to submit donation" });
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -122,7 +136,7 @@ export default function Donate() {
       <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white p-8 rounded-xl shadow-lg border border-gray-100 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">List an Item</h1>
-          <span className="text-xs text-gray-400 font-mono uppercase">API: {BASE_URL.includes('localhost') ? 'Local' : 'Remote'}</span>
+          <span className="text-xs text-gray-400">API: {API_BASE_URL}</span>
         </div>
 
         {status && (
@@ -132,7 +146,7 @@ export default function Donate() {
           </div>
         )}
 
-        {/* Image Upload Area */}
+        {/* Image Upload */}
         <div className="space-y-2">
           {!preview ? (
             <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
@@ -157,7 +171,7 @@ export default function Donate() {
               <button 
                 type="button" 
                 onClick={() => {setPreview(""); setImageFile(null);}} 
-                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
               >
                 <X size={16}/>
               </button>
@@ -165,7 +179,6 @@ export default function Donate() {
           )}
         </div>
 
-        {/* Title & Category */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input 
             placeholder="Title" 
@@ -185,7 +198,6 @@ export default function Donate() {
           </select>
         </div>
 
-        {/* Condition & Quantity */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <select 
             className="p-3 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-green-500" 
@@ -211,7 +223,6 @@ export default function Donate() {
           />
         </div>
 
-        {/* Location */}
         <div className="relative">
           <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
           <input 
@@ -223,10 +234,9 @@ export default function Donate() {
           />
         </div>
 
-        {/* Description */}
         <textarea 
           placeholder="Description" 
-          className="p-3 border rounded-lg w-full h-32 outline-none focus:ring-2 focus:ring-green-500 transition-all" 
+          className="p-3 border rounded-lg w-full h-32 outline-none focus:ring-2 focus:ring-green-500" 
           required 
           value={formData.description} 
           onChange={(e) => setFormData({ ...formData, description: e.target.value })} 

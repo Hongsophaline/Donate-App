@@ -10,41 +10,69 @@ const Navbar = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0); // State for the dynamic count
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  // 1. Check Login Status
+  // Check login status whenever route changes
   useEffect(() => {
     const token = Cookies.get("token");
-    setIsLoggedIn(!!token);
-    if (token) fetchUnreadCount(); // Fetch count if logged in
+
+    if (token) {
+      setIsLoggedIn(true);
+      fetchUnreadCount();
+    } else {
+      setIsLoggedIn(false);
+      setUnreadCount(0);
+    }
   }, [location]);
 
-  // 2. Fetch Notification Count from API
+  // Fetch unread notifications
   const fetchUnreadCount = async () => {
     try {
       const token = Cookies.get("token");
       if (!token) return;
 
-      const res = await fetch("http://localhost:8080/api/v1/notifications/unread-count", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        "http://localhost:8080/api/v1/notifications/unread-count",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      if (res.ok) {
-        const count = await res.json();
-        setUnreadCount(count);
+      if (!res.ok) {
+        console.error("Failed to fetch unread count:", res.status);
+        return;
       }
-    } catch (err) {
-      console.error("Error fetching notification count:", err);
+
+      const data = await res.json();
+      console.log("Unread response:", data);
+
+      const count =
+        typeof data === "number"
+          ? data
+          : data.unreadCount ?? data.count ?? 0;
+
+      setUnreadCount(count);
+    } catch (error) {
+      console.error("Error fetching notification count:", error);
+      setUnreadCount(0);
     }
   };
 
-  // 3. Listen for global refresh events (triggered after Approve/Reject)
+  // Listen for notification refresh events
   useEffect(() => {
     const handleRefresh = () => fetchUnreadCount();
+
     window.addEventListener("refreshNotifications", handleRefresh);
-    return () => window.removeEventListener("refreshNotifications", handleRefresh);
+
+    return () => {
+      window.removeEventListener("refreshNotifications", handleRefresh);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -68,10 +96,14 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-10 py-2">
         {/* Logo */}
         <Link to="/">
-          <img src={logoImg} alt="Logo" className="w-[90px] h-[70px] object-contain" />
+          <img
+            src={logoImg}
+            alt="Logo"
+            className="w-[90px] h-[70px] object-contain"
+          />
         </Link>
 
-        {/* Center Navigation Links (Desktop) */}
+        {/* Desktop Navigation */}
         <div className="hidden md:flex gap-1 lg:gap-3 font-medium text-gray-700">
           {paths.map((path, i) => (
             <NavLink key={i} to={path} className={navClass}>
@@ -80,7 +112,7 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* Right Side Actions */}
+        {/* Right Side */}
         <div className="flex items-center gap-1 md:gap-3">
           <div className="hidden sm:block">
             <LanguageSelector />
@@ -95,7 +127,7 @@ const Navbar = () => {
                   title={t("notifications.title")}
                 >
                   <Bell size={22} />
-                  {/* Dynamic Notification Badge */}
+
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
                       {unreadCount > 99 ? "99+" : unreadCount}
@@ -131,34 +163,59 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Hamburger */}
+          {/* Mobile menu button */}
           <div className="md:hidden flex items-center ml-1">
-            <button className="p-2 rounded-md hover:bg-gray-100 transition" onClick={() => setIsOpen(!isOpen)}>
+            <button
+              className="p-2 rounded-md hover:bg-gray-100 transition"
+              onClick={() => setIsOpen(!isOpen)}
+            >
               {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <div className={`md:hidden bg-white border-t overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-screen opacity-100 py-6" : "max-h-0 opacity-0"}`}>
+      {/* Mobile menu */}
+      <div
+        className={`md:hidden bg-white border-t overflow-hidden transition-all duration-300 ease-in-out ${
+          isOpen ? "max-h-screen opacity-100 py-6" : "max-h-0 opacity-0"
+        }`}
+      >
         <div className="flex flex-col px-6 gap-4 font-medium text-gray-700">
           {paths.map((path, i) => (
-            <NavLink key={i} to={path} className={navClass} onClick={() => setIsOpen(false)}>
+            <NavLink
+              key={i}
+              to={path}
+              className={navClass}
+              onClick={() => setIsOpen(false)}
+            >
               {t(`navbar.${labels[i]}`)}
             </NavLink>
           ))}
+
           {isLoggedIn ? (
             <>
-              <NavLink to="/profile" className={navClass} onClick={() => setIsOpen(false)}>
+              <NavLink
+                to="/profile"
+                className={navClass}
+                onClick={() => setIsOpen(false)}
+              >
                 {t("profile.title")}
               </NavLink>
-              <button onClick={handleLogout} className="w-full py-4 text-center bg-red-50 text-red-600 rounded-xl font-bold">
+
+              <button
+                onClick={handleLogout}
+                className="w-full py-4 text-center bg-red-50 text-red-600 rounded-xl font-bold"
+              >
                 {t("profile.logoutLink") || "Logout"}
               </button>
             </>
           ) : (
-            <Link to="/signup" className="w-full py-4 text-center bg-green-600 text-white rounded-xl font-bold" onClick={() => setIsOpen(false)}>
+            <Link
+              to="/signup"
+              className="w-full py-4 text-center bg-green-600 text-white rounded-xl font-bold"
+              onClick={() => setIsOpen(false)}
+            >
               {t("navbar.signUp")}
             </Link>
           )}

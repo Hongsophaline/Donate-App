@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
@@ -13,7 +13,7 @@ import ProfileHeader from "../components/ProfileHeader";
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const ProfilePage = () => {
-  const { t } = useTranslation();
+  useTranslation();
   const navigate = useNavigate();
   const [userData, setUserData] = useState<any>(null);
   const [pendingCount, setPendingCount] = useState(0);
