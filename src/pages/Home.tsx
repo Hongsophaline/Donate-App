@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import hero from "../assets/hero-home.webp";
+import Cookies from "js-cookie";
 import {
   ClipboardList,
   Search,
@@ -21,9 +22,9 @@ const HomePage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  // AUTH LOGIC: Checks if a user is logged in (e.g., checking localStorage)
-  // Replace "user_token" with whatever key you use for your login session
-  const isLoggedIn = !!localStorage.getItem("user_token");
+  // ✅ AUTH
+  const token = Cookies.get("token");
+  const isLoggedIn = !!token;
 
   const handleGetStarted = () => {
     if (isLoggedIn) {
@@ -100,27 +101,31 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="overflow-x-hidden">
-      {/* Hero Section */}
+      {/* HERO */}
       <section className="flex flex-col-reverse md:flex-row items-center justify-between px-6 md:px-20 py-12 md:py-16 gap-8 md:gap-16">
         <div className="flex-1 space-y-4 md:space-y-6 text-center md:text-left">
           <span className="text-[#B33D11] bg-[#FDF2F0] px-3 py-1 rounded-full text-sm font-semibold">
             {t("home.hero.tagline")}
           </span>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-gray-900">
+
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
             {t("home.hero.titlePart1")}
             <br />
             <span className="text-[#B33D11]">{t("home.hero.titlePart2")}</span>
           </h1>
-          <p className="text-gray-600 text-base sm:text-lg max-w-full md:max-w-md mx-auto md:mx-0">
+
+          <p className="text-gray-600 text-base sm:text-lg max-w-md">
             {t("home.hero.desc")}
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start">
+
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <button
               onClick={handleGetStarted}
               className="bg-[#B33D11] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#96320e] transition-all"
             >
-              {t("home.hero.getStarted")}
+              {isLoggedIn ? "Start Donating →" : t("home.hero.getStarted")}
             </button>
+
             <Link to="/how-it-works">
               <button className="border border-gray-300 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
                 {t("home.hero.howItWorks")}
@@ -128,80 +133,76 @@ const HomePage: React.FC = () => {
             </Link>
           </div>
         </div>
+
         <div className="flex-1">
           <img
             src={hero}
             alt={t("home.hero.alt")}
-            className="rounded-2xl shadow-xl object-cover w-full h-auto"
+            className="rounded-2xl shadow-xl w-full"
           />
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="bg-[#F9F9F9] py-12 md:py-16 px-6 md:px-20">
-        <div className="max-w-6xl mx-auto text-center">
+      {/* FEATURES */}
+      <section className="bg-[#F9F9F9] py-12 px-6 md:px-20">
+        <div className="text-center max-w-6xl mx-auto">
           <h4 className="text-[#B33D11] font-bold mb-2">
             {t("home.features.title")}
           </h4>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 md:mb-12">
+
+          <h2 className="text-3xl font-bold mb-10">
             {t("home.features.subtitle")}
           </h2>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {features.map((f, i) => (
               <div
                 key={i}
-                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-left hover:shadow-md transition-all"
+                className="bg-white p-6 rounded-xl shadow-sm text-left"
               >
-                <div className="text-gray-700 mb-3">{f.icon}</div>
-                <h3 className="font-bold text-lg mb-1">{f.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">
-                  {f.desc}
-                </p>
+                <div className="mb-3 text-gray-700">{f.icon}</div>
+                <h3 className="font-bold text-lg">{f.title}</h3>
+                <p className="text-gray-500 text-sm">{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-12 md:py-20 bg-white">
-        <div className="max-w-6xl mx-auto text-center px-4">
-          <h4 className="text-[#B33D11] font-bold mb-2">
-            {t("home.categories.title")}
-          </h4>
-          <h2 className="text-2xl sm:text-3xl font-bold mb-8">
-            {t("home.categories.subtitle")}
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-            {categories.map((c, i) => (
-              <div
-                key={i}
-                className="border border-gray-200 rounded-lg p-6 flex flex-col items-center gap-3 hover:border-[#B33D11] hover:text-[#B33D11] transition-all cursor-pointer"
-              >
-                {c.icon}
-                <span className="font-bold text-sm">{c.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="py-12 md:py-20 px-6 text-center">
-        <h4 className="text-[#B33D11] font-bold mb-2 uppercase tracking-widest text-sm">
-          {t("home.steps.title")}
+      {/* CATEGORIES */}
+      <section className="py-12 md:py-20 text-center">
+        <h4 className="text-[#B33D11] font-bold">
+          {t("home.categories.title")}
         </h4>
-        <h2 className="text-2xl sm:text-3xl font-bold mb-12 italic">
+
+        <h2 className="text-3xl font-bold mb-8">
+          {t("home.categories.subtitle")}
+        </h2>
+
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 px-6">
+          {categories.map((c, i) => (
+            <div key={i} className="border p-6 rounded-lg">
+              {c.icon}
+              <p className="font-bold text-sm mt-2">{c.name}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* STEPS */}
+      <section className="py-12 md:py-20 text-center px-6">
+        <h4 className="text-[#B33D11] font-bold">{t("home.steps.title")}</h4>
+
+        <h2 className="text-3xl font-bold mb-10 italic">
           {t("home.steps.subtitle")}
         </h2>
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-          {steps.map((step) => (
-            <div key={step.id} className="space-y-4 text-left md:text-center">
-              <span className="text-4xl font-extrabold text-[#38C1E2] block">
-                {step.id}
-              </span>
-              <h3 className="font-bold text-xl">{step.title}</h3>
-              <p className="text-gray-500 text-sm">{step.desc}</p>
+          {steps.map((s) => (
+            <div key={s.id}>
+              <h1 className="text-4xl text-[#38C1E2] font-bold">{s.id}</h1>
+              <h3 className="font-bold text-lg">{s.title}</h3>
+              <p className="text-gray-500 text-sm">{s.desc}</p>
             </div>
           ))}
         </div>
