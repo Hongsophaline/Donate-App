@@ -1,15 +1,5 @@
-import React from 'react';
 import { MapPin, Clock } from "lucide-react";
 
-interface DonationItem {
-  id: string;
-  title: string;
-  location: string;
-  timeAgo: string;
-  category: string;
-  imageUrl: string;
-  condition: string; // Dynamic condition (New, Good, etc.)
-}
 
 const DonationCard = ({ item, onOpenRequest }: { item: any; onOpenRequest: (id: string) => void }) => {
   // Logic to match the peach color in your screenshot for specific conditions
