@@ -2,13 +2,12 @@
   "name": "my-app",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
+  "type": "module","scripts": {
+  "dev": "vite",
+  "build": "vite build", 
+  "lint": "eslint .",
+  "preview": "vite preview"
+},
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-router": "^1.168.23",
