@@ -1,6 +1,5 @@
 import React from 'react';
-// If using Lucide or FontAwesome for icons, import them here. 
-// Otherwise, we use standard emojis/SVG to match the design.
+import { MapPin, Clock } from "lucide-react";
 
 interface DonationItem {
   id: string;
@@ -9,56 +8,63 @@ interface DonationItem {
   timeAgo: string;
   category: string;
   imageUrl: string;
+  condition: string; // Dynamic condition (New, Good, etc.)
 }
 
-interface DonationCardProps {
-  item: DonationItem;
-}
+const DonationCard = ({ item, onOpenRequest }: { item: any; onOpenRequest: (id: string) => void }) => {
+  // Logic to match the peach color in your screenshot for specific conditions
+  const getBadgeColor = (condition: string) => {
+    if (condition === "Like New" || condition === "New") return "bg-[#DEC0B1] text-[#A66E53]";
+    return "bg-[#D9D9D9] text-gray-700"; // Default gray for others
+  };
 
-const DonationCard: React.FC<DonationCardProps> = ({ item }) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col">
-      {/* 1. Image Section */}
-      <div className="h-48 w-full bg-gray-100">
-        <img 
-          src={item.imageUrl} 
-          alt={item.title} 
-          className="w-full h-full object-cover"
-        />
+    <div className="bg-gray-100 rounded-2xl shadow-sm overflow-hidden flex flex-col p-3 border border-gray-200 w-full max-w-sm mx-auto">
+      {/* Image Container */}
+      <div className="h-56 w-full rounded-xl overflow-hidden mb-4 bg-white">
+        <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
       </div>
 
-      {/* 2. Content Section */}
-      <div className="p-4 flex flex-col gap-3">
-        {/* Title */}
-        <h3 className="text-gray-800 font-bold text-lg leading-tight">
-          {item.title}
-        </h3>
+      {/* Info Container */}
+      <div className="px-1 flex flex-col gap-3">
+        <h3 className="text-gray-900 font-bold text-xl truncate">{item.title}</h3>
 
-        {/* Location and Time (Metadata Row) */}
-        <div className="flex items-center justify-between text-gray-500 text-xs">
+        <div className="flex items-center gap-4 text-gray-500 text-sm font-medium">
           <div className="flex items-center gap-1">
-            <span>📍</span> <span>{item.location}</span>
+            <MapPin size={16} className="text-gray-400" />
+            <span>{item.location}</span>
           </div>
           <div className="flex items-center gap-1">
-            <span>🕒</span> <span>{item.timeAgo}</span>
+            <Clock size={16} className="text-gray-400" />
+            <span>{item.timeAgo}</span>
           </div>
         </div>
 
-        {/* Category Tag and View Details Link */}
+        {/* Tags Row */}
         <div className="flex items-center justify-between mt-1">
-          <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
+          <span className="bg-[#D9D9D9] text-gray-700 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider">
             {item.category}
           </span>
-          <button className="text-orange-500 bg-orange-50 px-3 py-1 rounded text-xs font-semibold hover:bg-orange-100 transition-colors">
-            View Details
-          </button>
+          <span className={`${getBadgeColor(item.condition)} px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider`}>
+            {item.condition}
+          </span>
         </div>
 
-        {/* Primary Action Button */}
-        <button className="w-full mt-2 py-2.5 border-2 border-orange-200 text-orange-700 text-sm font-bold rounded-md hover:bg-orange-50 transition-all active:scale-[0.98]">
+        {/* Action Button */}
+        <button 
+          onClick={() => onOpenRequest(item.id)}
+          className="w-full mt-3 py-3 border-2 border-[#C84C0E] text-[#C84C0E] font-bold rounded-xl hover:bg-[#C84C0E] hover:text-white transition-all text-base uppercase tracking-widest"
+        >
           Request Item
         </button>
+          <button 
+  onClick={() => onOpenRequest(item.id)} // This now triggers the Detail Modal in Browse.tsx
+  className="text-orange-500 bg-orange-50 px-1 py-3 rounded text-xs font-semibold hover:bg-orange-100 transition-colors"
+>
+  Read More
+</button>
       </div>
+    
     </div>
   );
 };

@@ -1,30 +1,52 @@
-import { useState, useEffect } from "react";
-import type { Notification } from "../types/notification"; 
-import { fetchNotifications } from "../api/notifications";
+import { useCallback, useEffect, useState } from "react";
+import { api, type Notification } from "../lib/api";
+import { useAuth } from "../hooks/useAuth";
 
-export const useNotifications = (userId: string) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function useNotifications(pollMs = 20000) {
+  const { user, isAuthed } = useAuth();
+  const [items, setItems] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(false);
 
- const loadNotifications = async () => {
-  const token = localStorage.getItem("token") || "";
-  if (!token) return setError("Token not found");
-  try {
+  const refresh = useCallback(async () => {
+    if (!isAuthed || !user?.id) return;
     setLoading(true);
-    setError(null);
-    const data = await fetchNotifications(userId, token); // <-- This waits for server
-    setNotifications(data);
-  } catch (err: any) {
-    setError(err.message || "Failed to load notifications.");
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const data = await api.getNotifications(user.id);
+      setItems(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error("Failed to fetch notifications:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, [isAuthed, user?.id]);
 
   useEffect(() => {
-    if (userId) loadNotifications();
-  }, [userId]);
+    refresh();
+    if (!isAuthed) return;
+    const t = setInterval(refresh, pollMs);
+    return () => clearInterval(t);
+  }, [refresh, isAuthed, pollMs]);
 
-  return { notifications, loading, error, loadNotifications, setNotifications };
-};
+  const unread = items.filter((n) => !n.read).length;
+
+  const markRead = async (id: string) => {
+    setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    try { 
+      await api.markNotificationRead(id); 
+    } catch (e) {
+      console.error("Error marking read:", e);
+    }
+  };
+
+  const markAll = async () => {
+    if (!user?.id) return;
+    setItems((prev) => prev.map((n) => ({ ...n, read: true })));
+    try { 
+      await api.markAllNotificationsRead(user.id); 
+    } catch (e) {
+      console.error("Error marking all read:", e);
+    }
+  };
+
+  return { items, unread, loading, refresh, markRead, markAll };
+}
